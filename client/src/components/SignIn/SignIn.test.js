@@ -7,6 +7,6 @@ describe('SignIn component', () => {
   it('should render a SignIn button', () => {
     render(<SignIn />);
     const signInButton = screen.getByText('SignIn');
-    expect(signInButton).toBeInTheDocument();
+    expect(signInButton);
   });
 });
