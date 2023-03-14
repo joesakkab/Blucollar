@@ -61,6 +61,7 @@ export default function Search(props) {
                     color='primary'
                     className={classes.button}
                     onClick={handleSearchSubmit}
+                    title='search-button'
                 >
                     Search
                 </Button>
