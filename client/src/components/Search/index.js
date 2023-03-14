@@ -66,37 +66,15 @@ import theme from './theme'
 //   }
 // }));
 
+
 const serverURL = "http://localhost:5000"
 // const fetch = require("node-fetch");
 
 export default function SearchForServiceProvider() {
 
   // Declaring states
-  // const classes = useStyles();
-  // const [searchTerm, setSearchTerm] = React.useState('');
   const [serviceProviders, setServiceProviders] = React.useState([]);
-  // const [clickedSubmit, setClickedSubmit] = React.useState(false);
-
-  // const callApiSearch = async (searchTerm) => {
-  //   const url = serverURL + "/api/searchbyservice";
-  //   console.log(url);
-  //   console.log(JSON.stringify(searchTerm))
-
-  //   const response = await fetch(url, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: {
-  //       "service": JSON.stringify(searchTerm)
-  //     }
-  //   });
-  //   const body = await response.json();
-  //   // const body = data;
-  //   if (response.status !== 200) throw Error(body.message);
-  //   console.log(" success : ", body);
-  //   return body;
-  // }
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const callApiGetProviders = async () => {
     const url = serverURL + "/api/load";
@@ -118,6 +96,7 @@ export default function SearchForServiceProvider() {
     getData();
   }, []);
 
+
   let getData = () => {
     callApiGetProviders()
       .then(res => {
@@ -127,37 +106,6 @@ export default function SearchForServiceProvider() {
     
   }
 
-  // const handleSearch = () => {
-  //   setClickedSubmit(true);
-  //   // Search();
-  // }
-
-  // const handleSearchTermChange = (event) => {
-  //   let text = event.target.innerText
-  //       // console.log(text);
-  //       if (text != "") {
-  //           setSearchTerm(text);
-  //       }
-  // }
-
-  // const Search = () => {
-  //   if (searchTerm == null) {
-  //     setSearchTerm("");
-  //   } else {
-  //     let searchTerm = {
-  //       'service': searchTerm + ''
-  //     }
-  //   }
-
-  //   callApiSearch()
-  //     .then(res => {
-  //       // console.log("callApiGetMovies returned: ", res)
-  //       var parsed = JSON.parse(res.express);
-  //       // console.log("callApiGetMovies parsed: ", parsed);
-  //       setSearchTerm(parsed);
-  //     });
-  // }
-
   return (
     <MuiThemeProvider theme={theme}>
       <div>
@@ -166,11 +114,15 @@ export default function SearchForServiceProvider() {
           <Typography variant='h5' align='center' gutterBottom>
             Welcome to the search page!
             You can search any provider you would like by service.
-            {/* {serviceProviders[0]} */}
           </Typography>
 
         </Grid>
-        <Search />
+        <Search
+            handleSearchSubmit={setSearchTerm}
+            setServiceProviders={setServiceProviders}
+            searchTerm={searchTerm}
+            serverURL={serverURL}
+        />
         <DisplaySearch data={serviceProviders} />
 
       </div>

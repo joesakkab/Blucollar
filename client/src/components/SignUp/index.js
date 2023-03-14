@@ -11,9 +11,6 @@ import {
 import validator from "validator";
 import * as FIELDS from '../../constants/serviceProviderConst';
 // import * as FIELDS from '../../constants/customerConst';
-import history from '../Navigation/history';
-import * as ROUTES from '../../constants/routes';
-import { Router, Switch, Route } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
