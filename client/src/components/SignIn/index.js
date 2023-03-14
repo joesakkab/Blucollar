@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useSyncExternalStore } from "react";
+import { Router, Switch, Route } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Typography,
@@ -8,7 +9,8 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@material-ui/core";
-import validator from "validator";
+import history from '../Navigation/history';
+import * as ROUTES from '../../constants/routes';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,6 +57,7 @@ function SignIn() {
   const serverURL = "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 
   const login = (submitUser) => {
     console.log(submitUser);
@@ -83,6 +86,9 @@ function SignIn() {
     return body;
   }
 
+  const handleCheckboxChange = (event) => {
+    setShowAdditionalInfo(event.target.checked);
+  };
 
 
   const handleSubmit1 = () => {
@@ -90,8 +96,9 @@ function SignIn() {
       let submitUser = {
         email: email,
         password: password,
+        isServiceProvider: showAdditionalInfo
       }
-      login(submitUser)
+      login(submitUser);
 
     } else {
       alert("Please ensure that all fields are entered!")
@@ -106,6 +113,7 @@ function SignIn() {
       </Typography>
       <Paper elevation={5} className={classes.paper}>
         <form noValidate autoComplete="off">
+            
           <TextField
             label="Email"
             variant="outlined"
@@ -127,6 +135,17 @@ function SignIn() {
             value={password}
             onChange={(password) => setPassword(password.target.value)}
             inputProps={{ maxLength: 30 }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked = {showAdditionalInfo}
+                onChange = {handleCheckboxChange}
+                name="showAdditionalInfo"
+                color="primary"
+              />
+            }
+            label="I am a Service Provider"
           />
           <Button
             variant="contained"
