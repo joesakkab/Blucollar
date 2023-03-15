@@ -10,6 +10,8 @@ import {
 } from "@material-ui/core";
 import validator from "validator";
 import * as FIELDS from '../../constants/serviceProviderConst';
+import history from "../Navigation/history";
+import * as ROUTES from "../../constants/routes";
 // import * as FIELDS from '../../constants/customerConst';
 
 const useStyles = makeStyles((theme) => ({
@@ -119,8 +121,8 @@ function SignUp() {
         'serviceType': serviceType,
         'isServiceProvider': isServiceProvider,
       }
-      console.log(submitUser);
-      addSignup(submitUser);
+      console.log(submitUser)
+      addSignup(submitUser)
       history.push(ROUTES.SEARCH);
 
     } else if (password !== confPassword) {

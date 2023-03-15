@@ -3,8 +3,6 @@ import useStyles from './Styles';
 
 import {TextField, Button, FormControl} from '@material-ui/core';
 
-
-
 export default function Search(props) {
 
     const serverURL = props.serverURL;
@@ -63,6 +61,8 @@ export default function Search(props) {
                     color='primary'
                     className={classes.button}
                     onClick={handleSearchSubmit}
+                    title='search-button'
+
                 >
                     Search
                 </Button>

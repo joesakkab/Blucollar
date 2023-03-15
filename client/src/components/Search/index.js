@@ -66,7 +66,6 @@ import theme from './theme'
 //   }
 // }));
 
-
 const serverURL = "http://localhost:5000"
 // const fetch = require("node-fetch");
 
@@ -92,10 +91,10 @@ export default function SearchForServiceProvider() {
     return body;
   }
 
+
   React.useEffect(() => {
     getData();
   }, []);
-
 
   let getData = () => {
     callApiGetProviders()
