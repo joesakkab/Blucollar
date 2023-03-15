@@ -1,10 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, Typography, TextField, Button } from '@material-ui/core';
-import { Card, CardActionArea, CardContent } from '@material-ui/core'
 import NavBar from '../NavigationBar';
-import Rating from '@material-ui/lab/Rating'
-import PrivateRoute from '../Navigation/PrivateRoute';
 import { useParams } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile';
 
@@ -67,9 +63,31 @@ function Profile() {
 //   const params = new URLSearchParams(window.location.pathname)
   const params = useParams();
   const [profile, setProfile] = useState([]);
+  const [certs, setCerts] = useState([]);
 
+  // call the profile api
   const callApiProfile = async (given_id) => {
     const url = serverURL + "/api/getprofile";
+    const profileID = JSON.stringify({"id": Number(given_id)})
+    
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: profileID,
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
+    console.log(" success : ", body);
+    return body;
+  }
+
+  // call the certs api
+  const callApiCerts = async (given_id) => {
+    const url = serverURL + "/api/getcerts";
+    console.log(url)
     const profileID = JSON.stringify({"id": Number(given_id)})
     
 
@@ -89,6 +107,8 @@ function Profile() {
   useEffect(() => {
     const given_id = params.id
     getProfileData(given_id);
+    getCertData(given_id)
+
   }, []);
 
   let getProfileData = (given_id) => {
@@ -98,19 +118,21 @@ function Profile() {
       setProfile(res["results"])
     })
   }
-  // Get request body using API and id as prop. Set it equal to 'body' variable.
-  //const results = callApiProfile(given_id)
-  //console.log(results)
+
+  let getCertData = (given_id) => {
+    callApiCerts(given_id)
+    .then(res => {
+      console.log("callApiCerts certification data returned: ", res)
+      setCerts(res["results"])
+    })
+  }
 
   return (
     <div>
-        <NavBar />
-
-            <div className={classes.listing}>
-                <DisplayProfile data={profile}/>
-            </div>
-        
-      
+      <NavBar />
+      <div className={classes.listing}>
+          <DisplayProfile profileData={profile} certData={certs}/>
+      </div>
     </div>
   );
 }

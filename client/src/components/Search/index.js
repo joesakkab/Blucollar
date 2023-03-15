@@ -66,7 +66,7 @@ import theme from './theme'
 //   }
 // }));
 
-const serverURL = "http://localhost:5000"
+const serverURL = ""
 // const fetch = require("node-fetch");
 
 export default function SearchForServiceProvider() {
