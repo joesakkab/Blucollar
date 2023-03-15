@@ -95,17 +95,30 @@ app.post("/api/signup", async (req, res) => {
 	connection.end();
 });
 
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
 	let connection = mysql.createConnection(config);
 
 	const email = req.body.email;
 	const pwd = req.body.password;
+	const isServ = req.body.isServiceProvider;
 
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
+	if (isServ) {
+		sql = 'SELECT * FROM krajesh.`Service Provider` WHERE Email = ? AND Password = ?';
+		console.log(sql);
+		data = [email, pwdHashed];
+		console.log(data);
+	} else {
+		sql = 'SELECT * FROM krajesh.`Customer` WHERE Email = ? AND Password = ?';
+		console.log(sql);
+		data = [email, pwdHashed];
+		console.log(data);
+	}
+
 	connection.query(
-		`SELECT * FROM user WHERE email = ${email} AND password = ${pwdHashed}`, 
-		[], 
+		sql, 
+		data, 
 		(error, results, fields) => {
 			if (error) {
 				return console.error(error.message);

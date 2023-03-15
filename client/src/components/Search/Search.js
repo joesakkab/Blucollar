@@ -1,7 +1,7 @@
 import React from 'react';
 import useStyles from './Styles';
-import {TextField, Button, FormControl} from '@material-ui/core';
 
+import {TextField, Button, FormControl} from '@material-ui/core';
 
 export default function Search(props) {
 
@@ -62,6 +62,7 @@ export default function Search(props) {
                     className={classes.button}
                     onClick={handleSearchSubmit}
                     title='search-button'
+
                 >
                     Search
                 </Button>
