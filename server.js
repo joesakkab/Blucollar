@@ -185,12 +185,9 @@ app.post('/api/load', (req, res) => {
 
 app.post('/api/getprofile', (req, res) => {
 	let connection = mysql.createConnection(config);
-
 	let id = req.body.id;
 	let sql = "SELECT * FROM `Service Provider` WHERE Service_ProviderID = ?";
-	console.log(sql);
 	let data = [id];
-	console.log(data);
 
 	connection.query(sql, data, (error, results, fields) => {
 		if (error) {
@@ -199,10 +196,32 @@ app.post('/api/getprofile', (req, res) => {
 
 		let string = JSON.stringify(results);
 		let obj = JSON.parse(string);
-		res.send({ results: obj });
+ 		res.send({ results: obj });
+    console.log({results: obj})
 	});
 	connection.end();
 });
+
+app.post('/api/getcerts', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+  console.log(id)
+	let sql = "SELECT certs.cert_name, certs.cert_img_ref FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
+	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    //console.log({results: obj})
+	});
+	connection.end();
+});
+
 
 app.listen(port, () => console.log(`Listening on port ${port}`)); //for the dev version
 //app.listen(port, '129.97.25.211'); //for the deployed version, specify the IP address of the server

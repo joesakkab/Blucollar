@@ -53,6 +53,18 @@ CREATE TABLE IF NOT EXISTS `krajesh`.`Service Request` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `krajesh`.`Certifications`
+-- -----------------------------------------------------
+CREATE TABLE `Certifications` (
+  `cert_id` int NOT NULL AUTO_INCREMENT,
+  `service_provider_id` int NOT NULL,
+  `cert_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `cert_img_ref` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`cert_id`),
+  KEY `service_providerID_idx` (`service_provider_id`),
+  CONSTRAINT `service_provider_id` FOREIGN KEY (`service_provider_id`) REFERENCES `Service Provider` (`Service_ProviderID`)
+) ENGINE=InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
