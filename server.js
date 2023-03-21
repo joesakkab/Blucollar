@@ -48,6 +48,7 @@ app.post("/api/signup", async (req, res) => {
 	const serviceType = req.body.serviceType;
 	const description = req.body.description;
 	const isServiceProvider = req.body.isServiceProvider;
+  const yearsExperience = req.body.yearsExperience;
 
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
@@ -68,9 +69,10 @@ app.post("/api/signup", async (req, res) => {
 	// check if service providor then add into service providor table, else, add to user table
 	let sql, data;
 	if (isServiceProvider) {
-		sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+		sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType, ExperienceYears) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 		console.log(sql);
-		data = [email, pwdHashed, first, last, location, description, serviceType];
+		data = [email, pwdHashed, first, last, location, description, serviceType, yearsExperience.substring(0,4)];
 		console.log(data);
 	} else {
 		sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';

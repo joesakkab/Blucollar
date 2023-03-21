@@ -85,5 +85,8 @@ export default makeStyles((theme) => ({
       },
       card: {
         color: theme.palette.primary.main
-      }
+      },
+      bold: {
+        fontWeight: 'bold'
+      },
   }));
