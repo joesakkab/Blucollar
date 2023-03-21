@@ -146,7 +146,7 @@ app.post("/api/login", async (req, res) => {
 app.post('/api/searchbyservice', (req, res) => {
 	let connection = mysql.createConnection(config);
 
-	let service = req.body.service;
+	let service = req.body.serviceType;
 
 	let sql = 'SELECT * FROM krajesh.`Service Provider` WHERE ServiceType LIKE ?';
 	console.log(sql);
@@ -169,7 +169,7 @@ app.post('/api/load', (req, res) => {
 	let connection = mysql.createConnection(config);
 
 	let sql = 'SELECT * FROM krajesh.`Service Provider`';
-	console.log(sql);
+	// console.log(sql);
 	let data = []
 
 	connection.query(sql, data, (error, results, fields) => {
@@ -180,7 +180,7 @@ app.post('/api/load', (req, res) => {
 		let string = JSON.stringify(results);
 		let obj = JSON.parse(string);
 		res.send({ results: obj });
-		console.log("Objects are ", obj)
+		// console.log("Objects are ", obj)
 	});
 	connection.end();
 });

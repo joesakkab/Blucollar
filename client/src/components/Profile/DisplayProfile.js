@@ -30,9 +30,6 @@ export default function DisplayProfile(props) {
                                 <Typography id="location" className={classes.test2}>
                                   {"Location: " + obj[FIELDS.LOCATION]}
                                 </Typography>
-                                <Typography id="experience" className={classes.test2}>
-                                  {"Established: " + obj[FIELDS.EXPERIENCE]}
-                                </Typography>
                             </CardContent>
                         </Card>
                       </Grid>
