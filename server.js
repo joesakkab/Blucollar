@@ -110,25 +110,11 @@ app.post("/api/login", async (req, res) => {
 
 	const email = req.body.email;
 	const pwd = req.body.password;
-	//const isServ = req.body.isServiceProvider;
 
-	//const pwdHashed = await bcrypt.hash(pwd, 10);
 
-	// if (isServ) {
-	// 	sql = 'SELECT * FROM krajesh.`Service Provider` WHERE Email = ?';
-	// 	console.log(sql);
-	// 	data = [email];
-	// 	console.log(data);
-	// } else {
-	// 	sql = 'SELECT * FROM krajesh.`Customer` WHERE Email = ?';
-	// 	console.log(sql);
-	// 	data = [email];
-	// 	console.log(data);
-	// }
-
-	sql = 'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email = ? UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email = ?'
+	let sql = 'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email = ? UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email = ?'
 	console.log(sql);
-	data = [email, email];
+	let data = [email, email];
 	console.log(data);
 	
 
