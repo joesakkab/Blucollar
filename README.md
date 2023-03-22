@@ -48,14 +48,15 @@ service provider clicks "Profile" on the navigation bar, it will take them to th
 7. Run 'cd ../' to go back to the MSCI-342-Project directory
 8. Run 'npm install yarn'
 
-Steps 9-11 are for extra dependencies needed for the app to function
+Steps 9-12 are for extra dependencies needed for the app to function
 
 9. Run 'npm install jsonwebtoken'
 10. Run 'npm install bcrypt'
 11. Run 'npm install validator'
-12. Run 'yarn dev' to open the application in development mode
+12. Run 'npm install js-cookies'
+13. Run 'yarn dev' to open the application in development mode
 
-If step 12 does not work on your machine, run the following in your command line before running yarn dev:
+If step 13 does not work on your machine, run the following in your command line before running yarn dev:
 'export NODE_OPTIONS=--openssl-legacy-provider'
 
 ### Summary of Installation Requirements
