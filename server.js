@@ -89,10 +89,17 @@ app.post("/api/signup", async (req, res) => {
 			if (error) {
 				return console.error(error.message);
 			}
-	
-			let string = JSON.stringify(results);
-			//let obj = JSON.parse(string);
-			res.status(200).send({ express: string });
+		}
+	)
+	connection.query(
+		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		[email, email], 
+		(error, results, fields) => {
+			let string = JSON.stringify(results)
+			let obj = JSON.parse(string);
+			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+			console.log(token);
+			res.status(200).send({ token: token });
 		}
 	);
 	connection.end();
@@ -147,15 +154,27 @@ app.post("/api/login", async (req, res) => {
 			// }
 		}
 
-		if (bcrypt.compare(pwd, results[0].Password)){
-			let string = JSON.stringify(results)
-			let obj = JSON.parse(string);
-			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
-			console.log(token);
-			res.status(200).send({ token: token })
+		console.log("results password is ", results[0].Password);
+		console.log("pwd is ", pwd)
+		bcrypt.compare(pwd, results[0].Password, (err, result) => {
+		
+		console.log(result)
+		if (err) {
+			console.log(err)
+			return 
 		} else {
-			return res.status(401).send({ error: 'Incorrect password' });
+			if (result) {
+				let string = JSON.stringify(results)
+				let obj = JSON.parse(string);
+				const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+				console.log(token);
+				res.status(200).send({ token: token });
+			} else {
+				console.log(err)
+				return res.status(401).send({ error: 'Incorrect password' });
+			}
 		}
+	})
 	});
 	connection.end();
 });
