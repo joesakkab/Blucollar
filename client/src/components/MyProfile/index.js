@@ -6,6 +6,7 @@ import NavBar from '../NavigationBar';
 import data from "../Search/sample-data.json"
 import Rating from '@material-ui/lab/Rating'
 import PrivateRoute from '../Navigation/PrivateRoute';
+import Cookies from 'js-cookies';
 
 const useStyles = makeStyles((theme) => ({
   root: {

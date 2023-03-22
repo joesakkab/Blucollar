@@ -58,14 +58,11 @@ function SignIn() {
   const serverURL = "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tokenAuth, setTokenAuth ] = useState('');
 
   const login = (submitUser) => {
     console.log(submitUser);
     callApiLogin(submitUser).then(res => {
       console.log("callApiLogin returned: ", res)
-      console.log(res.token)
-      setTokenAuth(res.token)
     })
   }
 
@@ -86,6 +83,8 @@ function SignIn() {
       // setStatus(response.status);
       alert(body.error)
     } else {
+      Cookies.setItem("token", body.token)
+      console.log("Cookie of token is", Cookies.getItem("token"))
       history.push(ROUTES.SEARCH);
     }
     console.log(" success : ", body);

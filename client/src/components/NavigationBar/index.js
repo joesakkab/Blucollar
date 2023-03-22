@@ -7,8 +7,7 @@ import history from '../Navigation/history';
 import { Box, Typography, Toolbar, AppBar, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import * as ROUTES from '../../constants/routes';
-
-
+import Cookies from 'js-cookies';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,6 +73,11 @@ const useStyles = makeStyles((theme) => ({
 const NavBar = () => {
     const classes = useStyles();
 
+    const handleSignOut = () => {
+      Cookies.removeItem('token')
+      history.push(ROUTES.LANDING)
+    }
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static" className={classes.appBar}>
@@ -105,7 +109,7 @@ const NavBar = () => {
 
                         <Button
                           className={classes.mainText}
-                          onClick = {() => history.push(ROUTES.LANDING)}
+                          onClick = {handleSignOut}
                         >
                           Sign Out
                         </Button>
