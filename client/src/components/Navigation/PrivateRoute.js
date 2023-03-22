@@ -6,6 +6,7 @@ import Landing from '../Landing'
 import MyProfile from "../MyProfile";
 import Profile from "../Profile"
 import SignUp from "../SignUp";
+import Inbox from '../Inbox';
 import * as ROUTES from '../../constants/routes';
 import SignIn from "../SignIn";
 
@@ -23,6 +24,7 @@ export default function PrivateRoute({
         <Route path={ROUTES.SEARCH} exact component={Search} />
         <Route path={ROUTES.SIGN_UP} exact component={SignUp} />
         <Route path={ROUTES.SIGN_IN} exact component={SignIn} />
+        <Route path={ROUTES.INBOX} exact component={Inbox} />
       </Switch>
     </Router>
   );

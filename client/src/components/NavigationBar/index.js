@@ -89,6 +89,13 @@ const NavBar = () => {
                           Search                        
                         </Button>
 
+                      <Button
+                          className={classes.mainText}
+                          onClick = {() => history.push(ROUTES.INBOX)}
+                      >
+                          Inbox
+                      </Button>
+
                         <Button
                           className={classes.mainText}
                           onClick = {() => history.push(ROUTES.MYPROFILE)}
