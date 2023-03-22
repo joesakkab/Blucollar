@@ -58,7 +58,6 @@ function SignIn() {
   const serverURL = "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [tokenAuth, setTokenAuth ] = useState('');
 
   const login = (submitUser) => {
@@ -94,23 +93,14 @@ function SignIn() {
     
   }
 
-  const handleCheckboxChange = (event) => {
-    setShowAdditionalInfo(event.target.checked);
-  };
-
 
   const handleSubmit1 = () => {
     if(email !== "" && password !== "") {
       let submitUser = {
         email: email,
-        password: password,
-        isServiceProvider: showAdditionalInfo
+        password: password
       }
       login(submitUser);
-      // console.log("Retrived token is ", tokenAuth)
-      // if (tokenAuth !== "") {
-      //   history.push(ROUTES.SEARCH);
-      // }
 
     } else {
       alert("Please ensure that all fields are entered!")
@@ -147,17 +137,6 @@ function SignIn() {
             value={password}
             onChange={(password) => setPassword(password.target.value)}
             inputProps={{ maxLength: 30 }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked = {showAdditionalInfo}
-                onChange = {handleCheckboxChange}
-                name="showAdditionalInfo"
-                color="primary"
-              />
-            }
-            label="I am a Service Provider"
           />
           <Button
             variant="contained"
