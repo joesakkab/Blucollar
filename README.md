@@ -48,15 +48,19 @@ service provider clicks "Profile" on the navigation bar, it will take them to th
 7. Run 'cd ../' to go back to the MSCI-342-Project directory
 8. Run 'npm install yarn'
 
-Steps 9-12 are for extra dependencies needed for the app to function
+9. Create a file called ".env" in the root directory of the project. Then on the first line of the file, write: JWT_KEY="<any string of characters>".
+This ensures that the json web token used to verify if a user is logged in or not works correctly.
 
-9. Run 'npm install jsonwebtoken'
-10. Run 'npm install bcrypt'
-11. Run 'npm install validator'
-12. Run 'npm install js-cookies'
-13. Run 'yarn dev' to open the application in development mode
+Steps 10-13 are for extra dependencies needed for the app to function
 
-If step 13 does not work on your machine, run the following in your command line before running yarn dev:
+10. Run 'npm install jsonwebtoken'
+11. Run 'npm install bcrypt'
+12. Run 'npm install validator'
+13. Run 'npm install js-cookies'
+14. Run 'npm install dotenv'
+15. Run 'yarn dev' to open the application in development mode
+
+If step 15 does not work on your machine, run the following in your command line before running yarn dev:
 'export NODE_OPTIONS=--openssl-legacy-provider'
 
 ### Summary of Installation Requirements
@@ -72,6 +76,8 @@ npm install yarn
 npm install jsonwebtoken
 npm install bcrypt
 npm install validator
+npm install js-cookies
+npm install dotenv
 export NODE_OPTIONS=--openssl-legacy-provider
 yarn dev
 ```
