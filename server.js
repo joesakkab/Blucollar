@@ -8,6 +8,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const { response } = require('express');
 const cors = require('cors');
+const { json } = require('express/lib/response.js');
 require("dotenv").config();
 
 const app = express();
@@ -52,8 +53,8 @@ app.post("/api/signup", async (req, res) => {
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
 	connection.query(
-		'SELECT * FROM krajesh.`Service Provider` WHERE Email LIKE "%?%"', 
-		[email], 
+		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		[email, email], 
 		(error, results, fields) => {
 			if (error) {
 				return console.error(error.message);
@@ -100,21 +101,27 @@ app.post("/api/login", async (req, res) => {
 
 	const email = req.body.email;
 	const pwd = req.body.password;
-	const isServ = req.body.isServiceProvider;
+	//const isServ = req.body.isServiceProvider;
 
-	const pwdHashed = await bcrypt.hash(pwd, 10);
+	//const pwdHashed = await bcrypt.hash(pwd, 10);
 
-	if (isServ) {
-		sql = 'SELECT * FROM krajesh.`Service Provider` WHERE Email = ? AND Password = ?';
-		console.log(sql);
-		data = [email, pwdHashed];
-		console.log(data);
-	} else {
-		sql = 'SELECT * FROM krajesh.`Customer` WHERE Email = ? AND Password = ?';
-		console.log(sql);
-		data = [email, pwdHashed];
-		console.log(data);
-	}
+	// if (isServ) {
+	// 	sql = 'SELECT * FROM krajesh.`Service Provider` WHERE Email = ?';
+	// 	console.log(sql);
+	// 	data = [email];
+	// 	console.log(data);
+	// } else {
+	// 	sql = 'SELECT * FROM krajesh.`Customer` WHERE Email = ?';
+	// 	console.log(sql);
+	// 	data = [email];
+	// 	console.log(data);
+	// }
+
+	sql = 'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email = ? UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email = ?'
+	console.log(sql);
+	data = [email, email];
+	console.log(data);
+	
 
 	connection.query(
 		sql, 
@@ -125,19 +132,29 @@ app.post("/api/login", async (req, res) => {
 			}
 
 			if (results.length == 0) {
-				res.status(403).send({ error: "User login failed (email and pwd pair don't match)" });
+				res.status(403).send({ error: "User login failed (email does not exist)" });
 				return // User already exists
-			} else {
-				let string = JSON.stringify(results);
-				let obj = JSON.parse(string);
-				const token = jwt.sign({ obj }, process.env.JWT_KEY, {
-					expiresIn: 86400 // expires in 24 hours
-				});
-				console.log(token);
-				res.status(200).send({ token: token });
-			}
+			// } else {
+			// 	// let string = JSON.stringify(results);
+			// 	// let obj = JSON.parse(string);
+			// 	// const token = jwt.sign({ obj }, process.env.JWT_KEY, {
+			// 	// 	expiresIn: 86400 // expires in 24 hours
+			// 	// });
+			// 	console.log(token);
+			// 	res.status(200).send({ token: token });
+			// }
 		}
-	);
+
+		if (bcrypt.compare(pwd, results[0].Password)){
+			let string = JSON.stringify(results)
+			let obj = JSON.parse(string);
+			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+			console.log(token);
+			res.status(200).send({ token: token })
+		} else {
+			return res.status(401).send({ error: 'Incorrect password' });
+		}
+	});
 	connection.end();
 });
 
