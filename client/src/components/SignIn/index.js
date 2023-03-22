@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import history from '../Navigation/history';
 import * as ROUTES from '../../constants/routes';
+import Cookies from 'js-cookies';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,13 +59,14 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+  const [tokenAuth, setTokenAuth ] = useState('');
 
   const login = (submitUser) => {
     console.log(submitUser);
     callApiLogin(submitUser).then(res => {
       console.log("callApiLogin returned: ", res)
-      var parsed = JSON.parse(res.express);
-      console.log("callApiLogin parsed: ", parsed);
+      console.log(res.token)
+      setTokenAuth(res.token)
     })
   }
 
@@ -78,12 +80,18 @@ function SignIn() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(Object)
+      body: JSON.stringify(userObject)
     });
     const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
+    if (response.status !== 200) {
+      // setStatus(response.status);
+      alert(body.error)
+    } else {
+      history.push(ROUTES.SEARCH);
+    }
     console.log(" success : ", body);
     return body;
+    
   }
 
   const handleCheckboxChange = (event) => {
@@ -99,6 +107,10 @@ function SignIn() {
         isServiceProvider: showAdditionalInfo
       }
       login(submitUser);
+      // console.log("Retrived token is ", tokenAuth)
+      // if (tokenAuth !== "") {
+      //   history.push(ROUTES.SEARCH);
+      // }
 
     } else {
       alert("Please ensure that all fields are entered!")
@@ -153,7 +165,7 @@ function SignIn() {
             className={classes.button}
             onClick = {handleSubmit1}
           >
-            SignIn
+            Sign In
           </Button>
         </form>
       </Paper>
