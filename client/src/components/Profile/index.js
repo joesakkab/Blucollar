@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import NavBar from '../NavigationBar';
 import { useParams } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile';
+import ServiceRequest from '../ServiceRequest/ServiceRequest';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -132,6 +133,9 @@ function Profile() {
       <NavBar />
       <div className={classes.listing}>
           <DisplayProfile profileData={profile} certData={certs}/>
+      </div>
+      <div>
+        <ServiceRequest profileData={profile}/>
       </div>
     </div>
   );
