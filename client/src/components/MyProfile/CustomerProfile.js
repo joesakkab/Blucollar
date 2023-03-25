@@ -17,6 +17,15 @@ export default function CustomerProviderProfile(props) {
     const handleEdit = () => {
       setReadOnlyState(false);
     }
+
+    const handleCancel = () => {
+      setReadOnlyState(true);
+    }
+
+    const handleConfirmEdits = () => {
+      // open a dialog to confirm the changes made
+      
+    }
     
     const classes = useStyles();
     return (
@@ -69,14 +78,36 @@ export default function CustomerProviderProfile(props) {
           </Grid>
           </div>
             
-          <Grid sx={classes.paper}>
-            <Button
-            disabled={!readOnlyState}
-            type='button'
-            onClick={handleEdit}>
-            {readOnlyState ? 'Edit Profile' : 'Editing Profile'}
-            </Button>
+          <div className={classes.listing}>
+          <Grid container spacing={1} sx={classes.paper}>
+              <Grid item xs={12}>
+                <Button
+                disabled={!readOnlyState}
+                type='button'
+                onClick={handleEdit}>
+                {readOnlyState ? 'Edit Profile' : 'Editing Profile'}
+                </Button>
+              </Grid>
+              {readOnlyState ? '' : 
+              <Grid item xs={12}>
+                <Button
+                  type='button'
+                  color='secondary'
+                  onClick={handleCancel}
+                  > Cancel Changes
+                </Button>
+
+                <Button
+                type='button'
+                color='primary'
+                onClick={handleConfirmEdits}
+                > Confirm Edits
+                </Button>
+              
+              </Grid>
+            }
           </Grid>
+          </div>
                        
         </form>
         
