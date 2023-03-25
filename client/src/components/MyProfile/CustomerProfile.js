@@ -7,7 +7,6 @@ export default function CustomerProviderProfile(props) {
 
     const obj = props.profileData;
     const id = obj['cust_id']
-
     const [fName, setFName] = useState(obj[FIELDS.FIRST]);
     const [LName, setLName] = useState(obj[FIELDS.LAST]);
     const [email, setEmail] = useState(obj[FIELDS.EMAIL]);
@@ -24,7 +23,6 @@ export default function CustomerProviderProfile(props) {
 
     const handleConfirmEdits = () => {
       // open a dialog to confirm the changes made
-      
     }
     
     const classes = useStyles();
@@ -108,7 +106,6 @@ export default function CustomerProviderProfile(props) {
             }
           </Grid>
           </div>
-                       
         </form>
         
     )
