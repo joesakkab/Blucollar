@@ -88,7 +88,7 @@ function MyProfile() {
     return (
       <div>
           <NavBar />
-          {/* <CustomerProfile profileData={userObj}/> */}
+          <CustomerProfile profileData={userObj}/>
       </div>
     );
   }
