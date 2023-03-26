@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import history from '../Navigation/history';
 import * as ROUTES from '../../constants/routes';
+import Cookies from 'js-cookies';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,14 +58,11 @@ function SignIn() {
   const serverURL = "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
 
   const login = (submitUser) => {
     console.log(submitUser);
     callApiLogin(submitUser).then(res => {
       console.log("callApiLogin returned: ", res)
-      var parsed = JSON.parse(res.express);
-      console.log("callApiLogin parsed: ", parsed);
     })
   }
 
@@ -78,25 +76,28 @@ function SignIn() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(Object)
+      body: JSON.stringify(userObject)
     });
     const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
+    if (response.status !== 200) {
+      // setStatus(response.status);
+      alert(body.error)
+    } else {
+      Cookies.setItem("token", body.token)
+      console.log("Cookie of token is", Cookies.getItem("token"))
+      history.push(ROUTES.SEARCH);
+    }
     console.log(" success : ", body);
     return body;
+    
   }
-
-  const handleCheckboxChange = (event) => {
-    setShowAdditionalInfo(event.target.checked);
-  };
 
 
   const handleSubmit1 = () => {
     if(email !== "" && password !== "") {
       let submitUser = {
         email: email,
-        password: password,
-        isServiceProvider: showAdditionalInfo
+        password: password
       }
       login(submitUser);
 
@@ -136,24 +137,13 @@ function SignIn() {
             onChange={(password) => setPassword(password.target.value)}
             inputProps={{ maxLength: 30 }}
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked = {showAdditionalInfo}
-                onChange = {handleCheckboxChange}
-                name="showAdditionalInfo"
-                color="primary"
-              />
-            }
-            label="I am a Service Provider"
-          />
           <Button
             variant="contained"
             color="primary"
             className={classes.button}
             onClick = {handleSubmit1}
           >
-            SignIn
+            Sign In
           </Button>
         </form>
       </Paper>

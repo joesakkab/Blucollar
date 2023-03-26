@@ -59,6 +59,7 @@ function SignUp() {
   const classes = useStyles();
 
   const serverURL = "";//"http://localhost:5000";
+  const currentDate = new Date().toISOString().slice(0, 10);
 
   const [isServiceProvider, setIsServiceProvider] = useState(false);
   const [description, setDescription] = useState("");
@@ -69,6 +70,7 @@ function SignUp() {
   const [confPassword, setConfPassword] = useState("");
   const [location, setLocation] = useState("");
   const [serviceType, setServiceType] = useState("");
+  const [yearsExperience, setYearsExperience] = useState(currentDate);
 
   const addSignup = (submitUser) => {
     console.log(submitUser);
@@ -120,6 +122,7 @@ function SignUp() {
         'description': description,
         'serviceType': serviceType,
         'isServiceProvider': isServiceProvider,
+        'yearsExperience': yearsExperience,
       }
       console.log(submitUser)
       addSignup(submitUser)
@@ -249,6 +252,14 @@ function SignUp() {
                 multiline
                 minRows={4}
                 inputProps={{ maxLength: 500 }}
+              />
+              <TextField
+                id="experience"
+                label="Years Experience:"
+                type="date"
+                defaultValue={yearsExperience}
+                className={classes.textField}
+                onChange={(yearsExperience) => setYearsExperience(yearsExperience.target.value)}
               />
             </Fragment>
           )}

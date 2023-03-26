@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Typography, Button } from '@material-ui/core';
 import history from '../Navigation/history';
 import * as ROUTES from '../../constants/routes';
+import Cookies from 'js-cookies';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +49,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Landing() {
   const classes = useStyles();
+
+  // Cookies.getItem('token') returns null
+  console.log("Token cookies is", Cookies.getItem('token'))
 
   return (
     <div className={classes.root}>

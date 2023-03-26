@@ -6,6 +6,10 @@ import NavBar from '../NavigationBar';
 import data from "../Search/sample-data.json"
 import Rating from '@material-ui/lab/Rating'
 import PrivateRoute from '../Navigation/PrivateRoute';
+import Cookies from 'js-cookies';
+import ServiceProviderProfile from './ServiceProviderProfile';
+import CustomerProfile from './CustomerProfile'
+import jwt_decode from 'jwt-decode';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,35 +67,32 @@ const useStyles = makeStyles((theme) => ({
 function MyProfile() {
   const classes = useStyles();
   const obj = data[0]
-  return (
-    <div>
-        <NavBar />
 
-            <div className={classes.listing}>
-              <Typography id="greeting" variant="h2" className={classes.test}>
-                Welcome to your profile page!
-              </Typography>
-              <Typography id="title" variant="h4" className={classes.test2}>
-                {obj.first + " " + obj.last}
-              </Typography>
-              <Typography id="service-type" variant="h6" className={classes.test2}>
-                Service Type: {obj["serviceType"]}
-              </Typography>
-              <Typography id="description">
-                Description: {obj.description}
-              </Typography>
-              <Typography sx={{fontWeight: 'bold'}} id="location">
-                Location: {obj["primaryLocation"]}
-              </Typography>
-              <Rating name="half-rating-read" defaultValue={obj.rating} precision={0.1} readOnly />
-              <Typography>
-                Rating: {obj.rating + " / 5.0"}
-              </Typography>
-            </div>
-        
-      
-    </div>
-  );
+  // parse the token 
+  // if the isServiceProvider is true, 
+  // display the ServiceProvoiderProfile component
+  // else display the CustomerProfile component
+  let token = Cookies.getItem('token')
+  const decodedToken = jwt_decode(token);
+  console.log("decoded token is ", decodedToken)
+  let userObj = decodedToken['obj'][0]
+  console.log("User is ", userObj)
+  if (userObj["cust_id"] === null) {
+    return (
+      <div>
+          <NavBar />
+          <ServiceProviderProfile profileData={userObj}/>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+          <NavBar />
+          <CustomerProfile profileData={userObj}/>
+      </div>
+    );
+  }
+  
 }
 
 export default MyProfile;
