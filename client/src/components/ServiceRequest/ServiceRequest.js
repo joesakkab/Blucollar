@@ -1,8 +1,7 @@
 import React from "react";
-import {Button, Modal, Box, Typography, MuiThemeProvider, TextField, makeStyles} from "@material-ui/core";
+import {Button, Modal, Box, MuiThemeProvider, TextField, makeStyles} from "@material-ui/core";
 import theme from '../Search/theme';
 import Cookies from "js-cookies";
-import * as ROUTES from '../../constants/routes';
 
 export default function ServiceRequest(props) {
 

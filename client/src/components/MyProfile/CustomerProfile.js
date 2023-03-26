@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Grid, Card, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import useStyles from '../Profile/Styles';
 import * as FIELDS from '../../constants/customerConst';
@@ -6,12 +6,12 @@ import * as FIELDS from '../../constants/customerConst';
 export default function CustomerProviderProfile(props) {
 
     const obj = props.profileData;
-    const id = obj['cust_id']
+    const id = props.id;
 
-    const [fName, setFName] = useState(obj[FIELDS.FIRST]);
-    const [LName, setLName] = useState(obj[FIELDS.LAST]);
-    const [email, setEmail] = useState(obj[FIELDS.EMAIL]);
-    const [location, setLocation] = useState(obj[FIELDS.LOCATION]);
+    const [fName, setFName] = useState(obj[0][FIELDS.FIRST]);
+    const [LName, setLName] = useState(obj[0][FIELDS.LAST]);
+    const [email, setEmail] = useState(obj[0][FIELDS.EMAIL]);
+    const [location, setLocation] = useState(obj[0][FIELDS.LOCATION]);
     const [readOnlyState, setReadOnlyState] = useState(true);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
@@ -32,11 +32,9 @@ export default function CustomerProviderProfile(props) {
     }
 
     const modifyProfile = (editUser) => {
-      callApiEditUser(editUser).then(res => {
-        console.log("callApiEditUser returned: ", res)
-        var parsed = JSON.parse(res.express);
-        console.log("callApiEditUser parsed: ", parsed);
-      })
+      callApiEditUser(editUser)
+      setReadOnlyState(true)
+      // either update the jwt token with the new information or use a backend api call to get profile data
     }
   
     const callApiEditUser = async (userObject) => {

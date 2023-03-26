@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Typography, CardContent, Grid, Box } from '@material-ui/core';
+import {Card, Typography, CardContent, Grid } from '@material-ui/core';
 import useStyles from './Styles';
 import * as FIELDS from '../../constants/serviceProviderConst';
 

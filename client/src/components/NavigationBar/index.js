@@ -68,8 +68,6 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-  const pages = ['Search', 'Profile', 'Sign Out']
-
 const NavBar = () => {
     const classes = useStyles();
 

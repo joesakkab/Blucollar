@@ -92,12 +92,13 @@ app.post("/api/signup", async (req, res) => {
 		}
 	)
 	connection.query(
-		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		'SELECT cust_id, Null as Service_ProviderID FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
 		[email, email], 
 		(error, results, fields) => {
 			let string = JSON.stringify(results)
 			let obj = JSON.parse(string);
-			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+      let tokenObj = {"cust_id": obj[0]["cust_id"], "Service_ProviderID": obj[0]['Service_ProviderID']}
+			const token = jwt.sign({ tokenObj }, process.env.JWT_KEY, { expiresIn: 86400});
 			console.log(token);
 			res.status(200).send({ token: token });
 		}
@@ -129,15 +130,6 @@ app.post("/api/login", async (req, res) => {
 			if (results.length == 0) {
 				res.status(403).send({ error: "User login failed (email does not exist)" });
 				return // User already exists
-			// } else {
-			// 	// let string = JSON.stringify(results);
-			// 	// let obj = JSON.parse(string);
-			// 	// const token = jwt.sign({ obj }, process.env.JWT_KEY, {
-			// 	// 	expiresIn: 86400 // expires in 24 hours
-			// 	// });
-			// 	console.log(token);
-			// 	res.status(200).send({ token: token });
-			// }
 		}
 
 		console.log("results password is ", results[0].Password);
@@ -152,7 +144,8 @@ app.post("/api/login", async (req, res) => {
 			if (result) {
 				let string = JSON.stringify(results)
 				let obj = JSON.parse(string);
-				const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+        let tokenObj = {"cust_id": obj[0]["cust_id"], "Service_ProviderID": obj[0]['Service_ProviderID']}
+				const token = jwt.sign({ tokenObj }, process.env.JWT_KEY, { expiresIn: 86400});
 				console.log(token);
 				res.status(200).send({ token: token });
 			} else {
@@ -207,7 +200,7 @@ app.post('/api/load', (req, res) => {
 	connection.end();
 });
 
-app.post('/api/getproviderprofile/', (req, res) => {
+app.post('/api/getproviderprofile', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
 	let sql = "SELECT * FROM `Service Provider` WHERE Service_ProviderID = ?";

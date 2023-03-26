@@ -1,13 +1,10 @@
-import React, { Fragment, useState, useSyncExternalStore } from "react";
-import { Router, Switch, Route } from "react-router-dom";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Typography,
   Paper,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
 } from "@material-ui/core";
 import history from '../Navigation/history';
 import * as ROUTES from '../../constants/routes';
