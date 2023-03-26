@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Grid, Card, CardContent, Typography, Button, } from '@material-ui/core';
+import { TextField, Grid, Card, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import useStyles from '../Profile/Styles';
 import * as FIELDS from '../../constants/customerConst';
 
@@ -13,6 +13,7 @@ export default function CustomerProviderProfile(props) {
     const [email, setEmail] = useState(obj[FIELDS.EMAIL]);
     const [location, setLocation] = useState(obj[FIELDS.LOCATION]);
     const [readOnlyState, setReadOnlyState] = useState(true);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
     const handleEdit = () => {
       setReadOnlyState(false);
@@ -22,9 +23,57 @@ export default function CustomerProviderProfile(props) {
       setReadOnlyState(true);
     }
 
-    const handleConfirmEdits = () => {
-      // open a dialog to confirm the changes made
-      
+    const handleConfirmDialog = () => {
+      setOpenConfirmDialog(true);
+    }
+
+    const handleDialogClose = () => {
+      setOpenConfirmDialog(false);
+    }
+
+    const modifyProfile = (editUser) => {
+      callApiEditUser(editUser).then(res => {
+        console.log("callApiEditUser returned: ", res)
+        var parsed = JSON.parse(res.express);
+        console.log("callApiEditUser parsed: ", parsed);
+      })
+    }
+  
+    const callApiEditUser = async (userObject) => {
+      const serverURL = ""
+      const url = serverURL + "/api/edituserprofile";
+      console.log(url);
+      console.log(JSON.stringify(userObject))
+  
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userObject)
+      });
+      const body = await response.json();
+      if (response.status !== 200) throw Error(body.message);
+      console.log(" success : ", body);
+      return body;
+    }
+
+    const handleSubmit = () => {
+      setOpenConfirmDialog(false);
+      if(fName !== "" && LName !== "" && email !== "" && location !== "") {
+        let editUser = {
+          'id': id,
+          'firstName': fName,
+          'lastName': LName,
+          'email': email,
+          'location': location,
+        }
+        console.log(editUser)
+        modifyProfile(editUser)
+        // history.push(ROUTES.SEARCH);
+      } else {
+        alert("Please ensure that all fields are entered!")
+      }
     }
     
     const classes = useStyles();
@@ -100,7 +149,7 @@ export default function CustomerProviderProfile(props) {
                 <Button
                 type='button'
                 color='primary'
-                onClick={handleConfirmEdits}
+                onClick={handleConfirmDialog}
                 > Confirm Edits
                 </Button>
               
@@ -108,6 +157,26 @@ export default function CustomerProviderProfile(props) {
             }
           </Grid>
           </div>
+
+          <Dialog
+            open={openConfirmDialog}
+            onClose={handleDialogClose}
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Are you sure you would like to edit your profile?"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Editing your profile cannot be undone, please verify your changes are correct before confirming.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button color='secondary' onClick={handleDialogClose}>Cancel</Button>
+              <Button color='primary' onClick={handleSubmit} autoFocus>
+                Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
                        
         </form>
         

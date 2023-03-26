@@ -207,11 +207,54 @@ app.post('/api/load', (req, res) => {
 	connection.end();
 });
 
-app.post('/api/getprofile', (req, res) => {
+app.post('/api/getproviderprofile/', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
 	let sql = "SELECT * FROM `Service Provider` WHERE Service_ProviderID = ?";
 	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.post('/api/getcustomerprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+	let sql = "SELECT * FROM `Customer` WHERE cust_id = ?"
+	let data = [id];
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+
+})
+
+app.put('/api/edituserprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+	const first = req.body.firstName;
+	const last = req.body.lastName;
+  const email = req.body.email;
+	const location = req.body.location;
+	
+	let sql = "UPDATE `Customer` SET `FirstName` = ?, `LastName` = ?, `Email` = ?, `PrimaryLocation` = ? WHERE (`cust_id` = ?)";
+	let data = [first, last, email, location, id];
 
 	connection.query(sql, data, (error, results, fields) => {
 		if (error) {
