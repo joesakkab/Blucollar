@@ -318,11 +318,12 @@ app.post('/api/updateservicerequest', (req, res) => {
 	if (sr.status == 'start') {
 		// provider contacts customer for extra details
 		let button_status = req.body.status;
+		let contact_info = req.body.contact;
 
 		if (button_status == 'accept') {
-			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted' WHERE Service_ReqID = ?";
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted', `contact_info` = ? WHERE Service_ReqID = ?";
 			console.log(sql);
-			let data = [sr_id];
+			let data = [contact_info, sr_id];
 			console.log(data);
 
 			var sr = {}
