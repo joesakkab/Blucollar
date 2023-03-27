@@ -86,7 +86,7 @@ function InboxPage() {
   let token = Cookies.getItem("token");
   const decodedToken = jwt_decode(token);
   console.log("decoded token is ", decodedToken);
-  let userObj = decodedToken["obj"][0];
+  let userObj = decodedToken['tokenObj'];
   console.log("User is ", userObj);
 
   const getRequests = () => {

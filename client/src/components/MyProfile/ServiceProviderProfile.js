@@ -24,8 +24,8 @@ export default function ServiceProviderProfile(props) {
     const [readOnlyState, setReadOnlyState] = useState(true);
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
     const [updatedCert, setUpdatedCert] = useState("");
-    const [editedCerts, setEditedCerts] = useState(false);
     const [openCertModal, setOpenCertModal] = useState(false);
+    const [editedCerts, setEditedCerts] = useState(false);
 
     const [certs, setCerts] = useState([]);
     const [fName, setFName] = useState(obj[0][FIELDS.FIRST]);
@@ -44,7 +44,7 @@ export default function ServiceProviderProfile(props) {
       let deleteDetails = {"cert_id": certID}
       callApiDeleteCert(deleteDetails)
       setEditedCerts(true)
-      console.log(editedCerts)
+      getCertData(id)
     }
 
     const handleCancel = () => {
@@ -75,6 +75,7 @@ export default function ServiceProviderProfile(props) {
 
     const handleConfirmAddCert = (updatedCert) => {
       let addCertDetails = {"cert_name": updatedCert, "service_provider_id": id}
+      setEditedCerts(true)
       callApiAddCert(addCertDetails)
       setOpenCertModal(false)
       getCertData(id)
@@ -98,8 +99,11 @@ export default function ServiceProviderProfile(props) {
       }
     
     useEffect(() => {
-        getCertData(id)
-    }, [JSON.stringify(certs)]);
+        if (certs.length === 0 || editedCerts) {
+          getCertData(id)
+          setEditedCerts(false)
+        }
+    }, [certs]);
 
     let getCertData = (id) => {
         callApiCerts(id)
