@@ -8,16 +8,8 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-<<<<<<< HEAD
-
-=======
-import CustInboxPage from "./CustInboxPage";
-import ServInboxPage from "./ServInboxPage";
 import NavBar from "../NavigationBar";
-import jwt_decode from "jwt-decode";
-import history from "../Navigation/history";
-const serverURL = "";
->>>>>>> 70f668957e715a902c64926e2e04a5f98974b1a7
+import jwtDecode from "jwt-decode";
 // export default function Inbox() {
 // 	return (
 // 		<MuiThemeProvider theme={theme}>
@@ -82,8 +74,9 @@ const initialMessages = [
   },
 ];
 
-<<<<<<< HEAD
-function ServInboxPage() {
+
+
+function CustInboxPage() {
   const classes = useStyles();
   const [messages, setMessages] = useState(initialMessages);
 
@@ -111,9 +104,7 @@ function ServInboxPage() {
 
   return (
     <div className={classes.root}>
-      <MuiThemeProvider theme={theme}>
-        <NavigationBar />
-      </MuiThemeProvider>
+      <NavBar />
       <Typography variant="h4" className={classes.title}>
         Inbox
       </Typography>
@@ -137,14 +128,7 @@ function ServInboxPage() {
                 className={classes.acceptButton}
                 onClick={() => handleAccept(message.id)}
               >
-                Accept
-              </Button>
-              <Button
-                variant="contained"
-                className={classes.declineButton}
-                onClick={() => handleDecline(message.id)}
-              >
-                Decline
+                Review
               </Button>
             </div>
           </Paper>
@@ -153,63 +137,4 @@ function ServInboxPage() {
     </div>
   );
 }
-export default ServInboxPage;
-=======
-function InboxPage() {
-  const [requests, setRequests] = useState([])
-  let token = Cookies.getItem("token");
-  const decodedToken = jwt_decode(token);
-  console.log("decoded token is ", decodedToken);
-  let userObj = decodedToken["obj"][0];
-  console.log("User is ", userObj);
-
-  const getRequests = () => {
-    callApiGetRequests().then(res => {
-      console.log("callApiGetServiceRequests returned: ", res)
-      setRequests(res['results'])
-    })
-  }
-  
-  const callApiGetRequests = async () => {
-    const url = serverURL + "/api/getservicerequests";
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      auth: "Bearer " + Cookies.getItem("token"),
-    });
-    const body = await response.json();
-    if (response.status !== 200) {
-      // setStatus(response.status);
-      alert(body.error)
-      return // no body returned
-    }
-    return body;
-  }
-
-
-  const handleRender = () => {
-    getRequests();
-  }
-
-
-  if (userObj["cust_id"] === null) {
-    return (
-      <div>
-        <NavBar />
-        <ServInboxPage />
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <NavBar />
-        <CustInboxPage />
-      </div>
-    );
-  }
-}
-export default InboxPage;
->>>>>>> 70f668957e715a902c64926e2e04a5f98974b1a7
+export default CustInboxPage;

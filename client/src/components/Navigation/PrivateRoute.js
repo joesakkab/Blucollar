@@ -9,6 +9,7 @@ import SignUp from "../SignUp";
 import Inbox from '../Inbox';
 import * as ROUTES from '../../constants/routes';
 import SignIn from "../SignIn";
+import InboxPage from "../Inbox";
 
 export default function PrivateRoute({
   //authenticated,
@@ -24,7 +25,7 @@ export default function PrivateRoute({
         <Route path={ROUTES.SEARCH} exact component={Search} />
         <Route path={ROUTES.SIGN_UP} exact component={SignUp} />
         <Route path={ROUTES.SIGN_IN} exact component={SignIn} />
-        <Route path={ROUTES.INBOX} exact component={Inbox} />
+        <Route path={ROUTES.INBOX} exact component={InboxPage} />
       </Switch>
     </Router>
   );

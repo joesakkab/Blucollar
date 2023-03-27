@@ -29,7 +29,13 @@ const auth = async (req, res, next) => {
 				.status(500)
 				.send({ auth: false, message: "Failed to authenticate token." });
 		// if everything good, save to request for use in other routes
-		req.userID = decoded.userID;
+		if (decoded.cust_id == null) {
+			req.userID = decoded.Service_ProviderID;
+			req.is_sr = true
+		} else if (decoded.cust_id == null) {
+			req.userID = decoded.cust_id;
+			req.is_sr = false
+		}
 		next();
 	});
 };
@@ -49,7 +55,7 @@ app.post("/api/signup", async (req, res) => {
 	const serviceType = req.body.serviceType;
 	const description = req.body.description;
 	const isServiceProvider = req.body.isServiceProvider;
-  const yearsExperience = req.body.yearsExperience;
+  	const yearsExperience = req.body.yearsExperience;
 
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
@@ -78,7 +84,7 @@ app.post("/api/signup", async (req, res) => {
 	} else {
 		sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';
 		console.log(sql);
-		data = [email, pwdHashed, first, last, location];
+		data = [email, pwd, first, last, location];
 		console.log(data);
 	}
 	
@@ -293,7 +299,6 @@ app.put('/api/editproviderprofile', (req, res) => {
 app.post('/api/getcerts', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
-  console.log(id)
 	let sql = "SELECT certs.cert_id, certs.cert_name FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
 	let data = [id];
 
@@ -351,6 +356,181 @@ app.post('/api/addcert', (req, res) => {
 	connection.end();
 });
 
+app.post('/api/initservicerequest', (req, res) => {
+	auth(req, res, () => {
+		let connection = mysql.createConnection(config);
+
+		let cust_id = req.userID;
+		let sp_id = req.body.sp_id;
+		let location = req.body.location;
+		let desc = req.body.desc;
+		let type = req.body.type;
+		let contact = req.body.contact_info;
+
+		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, 'start')";
+		console.log(sql);
+		let data = [cust_id, sp_id, location, desc, type, contact];
+		console.log(data);
+
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
+
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+		connection.end();
+	});
+});
+
+app.post('/api/getservicerequests', (req, res) => {
+	auth(req, res, () => {
+		let connection = mysql.createConnection(config);
+
+		let id = req.userID;
+		let is_sr = req.is_sr;
+		
+		if (is_sr) {
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `service_providerID` = ?";
+			console.log(sql);
+			let data = [id];
+			console.log(data);
+
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+			connection.end();
+		} else {
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
+			console.log(sql);
+			let data = [id];
+			console.log(data);
+	
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+	
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+			connection.end();
+		}
+	});
+});
+
+app.post('/api/updateservicerequest', (req, res) => {
+	let connection = mysql.createConnection(config);
+
+	let sr_id = req.body.service_request_id;
+	
+	let sql = "SELECT * FROM krajesh.`Service Request` WHERE Service_ReqID = ?";
+	console.log(sql);
+	let data = [sr_id];
+	console.log(data);
+
+	var sr = {}
+  
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		sr = JSON.parse(string);
+	});
+
+	if (sr.status == 'start') {
+		// provider contacts customer for extra details
+		let button_status = req.body.status;
+
+		if (button_status == 'accept') {
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted'WHERE Service_ReqID = ?";
+			console.log(sql);
+			let data = [sr_id];
+			console.log(data);
+
+			var sr = {}
+
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+		} else if (button_status == 'decline') {
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'declined' WHERE Service_ReqID = ?";
+			console.log(sql);
+			let data = [sr_id];
+			console.log(data);
+
+			var sr = {}
+
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+		}
+	} else if (sr.status == 'accepted') {
+		// provider accepts request and completes the job
+		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'review' WHERE Service_ReqID = ?";
+		console.log(sql);
+		let data = [sr_id];
+		console.log(data);
+
+		var sr = {}
+
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
+
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+	} else if (sr.status == 'review') {
+		// set status to 'completed'
+		let review_score = req.body.score;
+		let review_desc = req.body.review;
+
+		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'completed', `review_score` = ?, `review_desc` = ? WHERE Service_ReqID = ?";
+		console.log(sql);
+		let data = [review_score, review_desc, sr_id];
+		console.log(data);
+
+		var sr = {}
+
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
+
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+	}
+
+	connection.end();
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`)); //for the dev version
 //app.listen(port, '129.97.25.211'); //for the deployed version, specify the IP address of the server

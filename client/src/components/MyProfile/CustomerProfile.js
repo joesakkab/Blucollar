@@ -174,8 +174,8 @@ export default function CustomerProviderProfile(props) {
                 Confirm
               </Button>
             </DialogActions>
-          </Dialog>
-                       
+          </Dialog>         
+
         </form>
         
     )
