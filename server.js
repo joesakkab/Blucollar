@@ -263,7 +263,7 @@ app.post('/api/initservicerequest', (req, res) => {
 		let type = req.body.type;
 		let contact = req.body.contact_info;
 
-		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`) VALUES (?, ?, ?, ?, ?, ?)";
+		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, 'start')";
 		console.log(sql);
 		let data = [cust_id, sp_id, location, desc, type, contact];
 		console.log(data);
