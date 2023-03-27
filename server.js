@@ -24,16 +24,17 @@ const auth = async (req, res, next) => {
 	if (!token)
 		return res.status(403).send({ auth: false, message: "No token provided." });
 	await jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+		console.log(decoded);
 		if (err)
 			return res
 				.status(500)
 				.send({ auth: false, message: "Failed to authenticate token." });
 		// if everything good, save to request for use in other routes
-		if (decoded.cust_id == null) {
-			req.userID = decoded.Service_ProviderID;
+		if (decoded['obj'][0]['cust_id'] == null) {
+			req.userID = decoded['obj'][0]['Service_ProviderID'];
 			req.is_sr = true
-		} else if (decoded.cust_id == null) {
-			req.userID = decoded.cust_id;
+		} else if (decoded['obj'][0]['Service_ProviderID'] == null) {
+			req.userID = decoded['obj'][0]['cust_id'];
 			req.is_sr = false
 		}
 		next();

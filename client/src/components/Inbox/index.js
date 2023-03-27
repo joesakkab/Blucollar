@@ -8,16 +8,14 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-<<<<<<< HEAD
 
-=======
 import CustInboxPage from "./CustInboxPage";
 import ServInboxPage from "./ServInboxPage";
 import NavBar from "../NavigationBar";
 import jwt_decode from "jwt-decode";
 import history from "../Navigation/history";
 const serverURL = "";
->>>>>>> 70f668957e715a902c64926e2e04a5f98974b1a7
+
 // export default function Inbox() {
 // 	return (
 // 		<MuiThemeProvider theme={theme}>
@@ -82,79 +80,7 @@ const initialMessages = [
   },
 ];
 
-<<<<<<< HEAD
-function ServInboxPage() {
-  const classes = useStyles();
-  const [messages, setMessages] = useState(initialMessages);
 
-  const handleAccept = (id) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) => {
-        if (message.id === id) {
-          return { ...message, status: "Accepted" };
-        }
-        return message;
-      })
-    );
-  };
-
-  const handleDecline = (id) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) => {
-        if (message.id === id) {
-          return { ...message, status: "Declined" };
-        }
-        return message;
-      })
-    );
-  };
-
-  return (
-    <div className={classes.root}>
-      <MuiThemeProvider theme={theme}>
-        <NavigationBar />
-      </MuiThemeProvider>
-      <Typography variant="h4" className={classes.title}>
-        Inbox
-      </Typography>
-      {messages.length === 0 ? (
-        <Typography variant="body1" className={classes.description}>
-          You have no messages.
-        </Typography>
-      ) : (
-        messages.map((message) => (
-          <Paper key={message.id} className={classes.paper}>
-            <div>
-              <Typography variant="h6">{message.subject}</Typography>
-              <Typography variant="subtitle1">
-                From: {message.sender}
-              </Typography>
-              <Typography variant="body1">{message.body}</Typography>
-            </div>
-            <div>
-              <Button
-                variant="contained"
-                className={classes.acceptButton}
-                onClick={() => handleAccept(message.id)}
-              >
-                Accept
-              </Button>
-              <Button
-                variant="contained"
-                className={classes.declineButton}
-                onClick={() => handleDecline(message.id)}
-              >
-                Decline
-              </Button>
-            </div>
-          </Paper>
-        ))
-      )}
-    </div>
-  );
-}
-export default ServInboxPage;
-=======
 function InboxPage() {
   const [requests, setRequests] = useState([])
   let token = Cookies.getItem("token");
@@ -212,4 +138,4 @@ function InboxPage() {
   }
 }
 export default InboxPage;
->>>>>>> 70f668957e715a902c64926e2e04a5f98974b1a7
+
