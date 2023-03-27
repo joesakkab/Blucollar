@@ -8,6 +8,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const { response } = require('express');
 const cors = require('cors');
+const { json } = require('express/lib/response.js');
 require("dotenv").config();
 
 const app = express();
@@ -48,12 +49,13 @@ app.post("/api/signup", async (req, res) => {
 	const serviceType = req.body.serviceType;
 	const description = req.body.description;
 	const isServiceProvider = req.body.isServiceProvider;
+  const yearsExperience = req.body.yearsExperience;
 
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
 	connection.query(
-		'SELECT * FROM krajesh.`Service Provider` WHERE Email LIKE "%?%"', 
-		[email], 
+		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		[email, email], 
 		(error, results, fields) => {
 			if (error) {
 				return console.error(error.message);
@@ -68,14 +70,15 @@ app.post("/api/signup", async (req, res) => {
 	// check if service providor then add into service providor table, else, add to user table
 	let sql, data;
 	if (isServiceProvider) {
-		sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+		sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType, ExperienceYears) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 		console.log(sql);
-		data = [email, pwdHashed, first, last, location, description, serviceType];
+		data = [email, pwdHashed, first, last, location, description, serviceType, yearsExperience.substring(0,4)];
 		console.log(data);
 	} else {
 		sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';
 		console.log(sql);
-		data = [email, pwdHashed, first, last, location];
+		data = [email, pwd, first, last, location];
 		console.log(data);
 	}
 	
@@ -86,10 +89,17 @@ app.post("/api/signup", async (req, res) => {
 			if (error) {
 				return console.error(error.message);
 			}
-	
-			let string = JSON.stringify(results);
-			//let obj = JSON.parse(string);
-			res.status(200).send({ express: string });
+		}
+	)
+	connection.query(
+		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		[email, email], 
+		(error, results, fields) => {
+			let string = JSON.stringify(results)
+			let obj = JSON.parse(string);
+			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+			console.log(token);
+			res.status(200).send({ token: token });
 		}
 	);
 	connection.end();
@@ -100,21 +110,13 @@ app.post("/api/login", async (req, res) => {
 
 	const email = req.body.email;
 	const pwd = req.body.password;
-	const isServ = req.body.isServiceProvider;
 
-	const pwdHashed = await bcrypt.hash(pwd, 10);
 
-	if (isServ) {
-		sql = 'SELECT * FROM krajesh.`Service Provider` WHERE Email = ? AND Password = ?';
-		console.log(sql);
-		data = [email, pwdHashed];
-		console.log(data);
-	} else {
-		sql = 'SELECT * FROM krajesh.`Customer` WHERE Email = ? AND Password = ?';
-		console.log(sql);
-		data = [email, pwdHashed];
-		console.log(data);
-	}
+	let sql = 'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email = ? UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email = ?'
+	console.log(sql);
+	let data = [email, email];
+	console.log(data);
+	
 
 	connection.query(
 		sql, 
@@ -125,19 +127,41 @@ app.post("/api/login", async (req, res) => {
 			}
 
 			if (results.length == 0) {
-				res.status(403).send({ error: "User login failed (email and pwd pair don't match)" });
+				res.status(403).send({ error: "User login failed (email does not exist)" });
 				return // User already exists
-			} else {
-				let string = JSON.stringify(results);
+			// } else {
+			// 	// let string = JSON.stringify(results);
+			// 	// let obj = JSON.parse(string);
+			// 	// const token = jwt.sign({ obj }, process.env.JWT_KEY, {
+			// 	// 	expiresIn: 86400 // expires in 24 hours
+			// 	// });
+			// 	console.log(token);
+			// 	res.status(200).send({ token: token });
+			// }
+		}
+
+		console.log("results password is ", results[0].Password);
+		console.log("pwd is ", pwd)
+		bcrypt.compare(pwd, results[0].Password, (err, result) => {
+		
+		console.log(result)
+		if (err) {
+			console.log(err)
+			return 
+		} else {
+			if (result) {
+				let string = JSON.stringify(results)
 				let obj = JSON.parse(string);
-				const token = jwt.sign({ obj }, process.env.JWT_KEY, {
-					expiresIn: 86400 // expires in 24 hours
-				});
+				const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
 				console.log(token);
 				res.status(200).send({ token: token });
+			} else {
+				console.log(err)
+				return res.status(401).send({ error: 'Incorrect password' });
 			}
 		}
-	);
+	})
+	});
 	connection.end();
 });
 
@@ -185,9 +209,75 @@ app.post('/api/load', (req, res) => {
 
 app.post('/api/getprofile', (req, res) => {
 	let connection = mysql.createConnection(config);
-
 	let id = req.body.id;
 	let sql = "SELECT * FROM `Service Provider` WHERE Service_ProviderID = ?";
+	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.post('/api/getcerts', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+  console.log(id)
+	let sql = "SELECT certs.cert_name, certs.cert_img_ref FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
+	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    //console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.post('/api/initservicerequest', (req, res) => {
+	let connection = mysql.createConnection(config);
+
+	let cust_id = req.body.cust_id;
+	let sp_id = req.body.sp_id;
+	let location = req.body.location;
+	let desc = req.body.desc;
+	let type = req.body.type;
+
+	let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ReqID`, `Location`, `Description`, `Service Type`) VALUES (?, ?, ?, ?, ?)";
+	console.log(sql);
+	let data = [cust_id, sp_id, location, desc, type];
+	console.log(data);
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+		res.send({ results: obj });
+	});
+	connection.end();
+});
+
+app.post('/api/getservicerequests', (req, res) => {
+	let connection = mysql.createConnection(config);
+
+	let id = req.userID;
+	
+	let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
 	console.log(sql);
 	let data = [id];
 	console.log(data);
@@ -201,6 +291,111 @@ app.post('/api/getprofile', (req, res) => {
 		let obj = JSON.parse(string);
 		res.send({ results: obj });
 	});
+	connection.end();
+});
+
+app.post('/api/updateservicerequest', (req, res) => {
+	let connection = mysql.createConnection(config);
+
+	let sr_id = req.body.service_request_id;
+	
+	let sql = "SELECT * FROM krajesh.`Service Request` WHERE Service_ReqID = ?";
+	console.log(sql);
+	let data = [sr_id];
+	console.log(data);
+
+	var sr = {}
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		sr = JSON.parse(string);
+	});
+
+	if (sr.status == 'start') {
+		// provider contacts customer for extra details
+		let button_status = req.body.status;
+		let contact_info = req.body.contact;
+
+		if (button_status == 'accept') {
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted', `contact_info` = ? WHERE Service_ReqID = ?";
+			console.log(sql);
+			let data = [contact_info, sr_id];
+			console.log(data);
+
+			var sr = {}
+
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+		} else if (button_status == 'decline') {
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'declined' WHERE Service_ReqID = ?";
+			console.log(sql);
+			let data = [sr_id];
+			console.log(data);
+
+			var sr = {}
+
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+		}
+	} else if (sr.status == 'accepted') {
+		// provider accepts request and completes the job
+		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'review' WHERE Service_ReqID = ?";
+		console.log(sql);
+		let data = [sr_id];
+		console.log(data);
+
+		var sr = {}
+
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
+
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+	} else if (sr.status == 'review') {
+		// set status to 'completed'
+		let review_score = req.body.score;
+		let review_desc = req.body.review;
+
+		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'completed', `review_score` = ?, `review_desc` = ? WHERE Service_ReqID = ?";
+		console.log(sql);
+		let data = [review_score, review_desc, sr_id];
+		console.log(data);
+
+		var sr = {}
+
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
+
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+	}
+
 	connection.end();
 });
 

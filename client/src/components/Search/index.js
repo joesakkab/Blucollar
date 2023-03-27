@@ -11,8 +11,10 @@ import * as ROUTES from '../../constants/routes';
 import { useState } from 'react';
 import DisplaySearch from './DisplaySearch';
 import Search from './Search';
-import theme from './theme'
+import theme from './theme';
+import Cookies from 'js-cookies';
 // import { appTheme } from '../../themes';
+
 
 // const useStyles = makeStyles((theme) => ({
 //   root: {
@@ -66,7 +68,8 @@ import theme from './theme'
 //   }
 // }));
 
-const serverURL = "http://localhost:5000"
+const serverURL = ""
+
 // const fetch = require("node-fetch");
 
 export default function SearchForServiceProvider() {
@@ -83,7 +86,8 @@ export default function SearchForServiceProvider() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-      }
+      },
+      auth: {"token" : Cookies.getItem("token")}
     });
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
@@ -102,6 +106,7 @@ export default function SearchForServiceProvider() {
         console.log("callApiGetProviders returned: ", res)
         setServiceProviders(res['results']);
     })
+    console.log("Cookie of token is", Cookies.getItem("token"))
     
   }
 
