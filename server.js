@@ -29,7 +29,13 @@ const auth = async (req, res, next) => {
 				.status(500)
 				.send({ auth: false, message: "Failed to authenticate token." });
 		// if everything good, save to request for use in other routes
-		req.userID = decoded.userID;
+		if (decoded.cust_id == null) {
+			req.userID = decoded.Service_ProviderID;
+			req.is_sr = true
+		} else if (decoded.cust_id == null) {
+			req.userID = decoded.cust_id;
+			req.is_sr = false
+		}
 		next();
 	});
 };
@@ -280,22 +286,41 @@ app.post('/api/getservicerequests', (req, res) => {
 		let connection = mysql.createConnection(config);
 
 		let id = req.userID;
+		let is_sr = req.is_sr;
 		
-		let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
-		console.log(sql);
-		let data = [id];
-		console.log(data);
+		if (is_sr) {
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `service_providerID` = ?";
+			console.log(sql);
+			let data = [id];
+			console.log(data);
 
-		connection.query(sql, data, (error, results, fields) => {
-			if (error) {
-				return console.error(error.message);
-			}
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
 
-			let string = JSON.stringify(results);
-			let obj = JSON.parse(string);
-			res.send({ results: obj });
-		});
-		connection.end();
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+			connection.end();
+		} else {
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
+			console.log(sql);
+			let data = [id];
+			console.log(data);
+	
+			connection.query(sql, data, (error, results, fields) => {
+				if (error) {
+					return console.error(error.message);
+				}
+	
+				let string = JSON.stringify(results);
+				let obj = JSON.parse(string);
+				res.send({ results: obj });
+			});
+			connection.end();
+		}
 	});
 });
 

@@ -74,6 +74,7 @@ export default function ServiceRequest(props) {
 
     const [description, setDescription] = React.useState('');
     const [location, setLocation] = React.useState('');
+    const [contact, setContact] = React.useState('');
     // const [request, setRequest] = React.useState([]);
 
 	return (
