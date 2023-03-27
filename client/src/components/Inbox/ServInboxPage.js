@@ -8,12 +8,10 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import CustInboxPage from "./CustInboxPage";
-import ServInboxPage from "./ServInboxPage";
 import NavBar from "../NavigationBar";
-import jwt_decode from "jwt-decode";
-import history from "../Navigation/history";
-const serverURL = "";
+import jwtDecode from "jwt-decode";
+
+
 // export default function Inbox() {
 // 	return (
 // 		<MuiThemeProvider theme={theme}>
@@ -78,60 +76,72 @@ const initialMessages = [
   },
 ];
 
-function InboxPage() {
-  const [requests, setRequests] = useState([])
-  let token = Cookies.getItem("token");
-  const decodedToken = jwt_decode(token);
-  console.log("decoded token is ", decodedToken);
-  let userObj = decodedToken["obj"][0];
-  console.log("User is ", userObj);
+function ServInboxPage() {
+  const classes = useStyles();
+  const [messages, setMessages] = useState(initialMessages);
 
-  const getRequests = () => {
-    callApiGetRequests().then(res => {
-      console.log("callApiGetServiceRequests returned: ", res)
-      setRequests(res['results'])
-    })
-  }
-  
-  const callApiGetRequests = async () => {
-    const url = serverURL + "/api/getservicerequests";
-    
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      auth: "Bearer " + Cookies.getItem("token"),
-    });
-    const body = await response.json();
-    if (response.status !== 200) {
-      // setStatus(response.status);
-      alert(body.error)
-      return // no body returned
-    }
-    return body;
-  }
-
-
-  const handleRender = () => {
-    getRequests();
-  }
-
-
-  if (userObj["cust_id"] === null) {
-    return (
-      <div>
-        <NavBar />
-        <ServInboxPage />
-      </div>
+  const handleAccept = (id) => {
+    setMessages((prevMessages) =>
+      prevMessages.map((message) => {
+        if (message.id === id) {
+          return { ...message, status: "Accepted" };
+        }
+        return message;
+      })
     );
-  } else {
-    return (
-      <div>
-        <NavBar />
-        <CustInboxPage />
-      </div>
+  };
+
+  const handleDecline = (id) => {
+    setMessages((prevMessages) =>
+      prevMessages.map((message) => {
+        if (message.id === id) {
+          return { ...message, status: "Declined" };
+        }
+        return message;
+      })
     );
-  }
+  };
+
+  return (
+    <div className={classes.root}>
+      <NavBar />
+      <Typography variant="h4" className={classes.title}>
+        Inbox
+      </Typography>
+      {messages.length === 0 ? (
+        <Typography variant="body1" className={classes.description}>
+          You have no messages.
+        </Typography>
+      ) : (
+        messages.map((message) => (
+          <Paper key={message.id} className={classes.paper}>
+            <div>
+              <Typography variant="h6">{message.subject}</Typography>
+              <Typography variant="subtitle1">
+                From: {message.sender}
+              </Typography>
+              <Typography variant="body1">{message.body}</Typography>
+            </div>
+            <div>
+              <Button
+                variant="contained"
+                className={classes.acceptButton}
+                onClick={() => handleAccept(message.id)}
+              >
+                Accept
+              </Button>
+              <Button
+                variant="contained"
+                className={classes.declineButton}
+                onClick={() => handleDecline(message.id)}
+              >
+                Decline
+              </Button>
+            </div>
+          </Paper>
+        ))
+      )}
+    </div>
+  );
 }
-export default InboxPage;
+export default ServInboxPage;
