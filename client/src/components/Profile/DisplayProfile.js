@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Typography, CardContent, Grid } from '@material-ui/core';
+import {Card, Typography, CardContent, Grid, Box, CardMedia } from '@material-ui/core';
 import useStyles from './Styles';
 import * as FIELDS from '../../constants/serviceProviderConst';
 
@@ -8,6 +8,7 @@ export default function DisplayProfile(props) {
 
     let profile = props.profileData;
     let certs = props.certData;
+    console.log(certs)
     const classes = useStyles();
     return (
         <>
@@ -58,11 +59,11 @@ export default function DisplayProfile(props) {
                       <Grid container spacing={4}>
                         <Grid item xs={8}>
                         <Card>
-                            <CardContent>
-                                <Typography id="serviceType" variant="h6" className={classes.test2}>
-                                  {obj[FIELDS.CERTIFICATION] !== null ? obj[FIELDS.CERTIFICATION] : "No certifications for this service provider."}
-                                </Typography>
-                            </CardContent>
+                          <CardContent>
+                              <Typography id="serviceType" variant="h6" className={classes.test2}>
+                                {obj[FIELDS.CERTIFICATION] !== null ? obj[FIELDS.CERTIFICATION] : "No certifications for this service provider."}
+                              </Typography>
+                          </CardContent>
                         </Card>
                         </Grid>
                         <Grid item xs={3}>

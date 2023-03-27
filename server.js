@@ -262,11 +262,39 @@ app.put('/api/edituserprofile', (req, res) => {
 	connection.end();
 });
 
+app.put('/api/editproviderprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+  console.log(id)
+	const first = req.body.firstName;
+	const last = req.body.lastName;
+  const email = req.body.email;
+	const location = req.body.location;
+  const description = req.body.description;
+  const serviceType = req.body.serviceType;
+  const experience = req.body.experience;
+
+	let sql = "UPDATE `Service Provider` SET `FirstName` = ?, `LastName` = ?, `Email` = ?, `PrimaryLocation` = ?, `Description` = ?, `ServiceType` = ?, `ExperienceYears` = ? WHERE (`Service_ProviderID` = ?)";
+	let data = [first, last, email, location, description, serviceType, experience, id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
 app.post('/api/getcerts', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
   console.log(id)
-	let sql = "SELECT certs.cert_name, certs.cert_img_ref FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
+	let sql = "SELECT certs.cert_id, certs.cert_name FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
 	let data = [id];
 
 	connection.query(sql, data, (error, results, fields) => {
@@ -278,6 +306,47 @@ app.post('/api/getcerts', (req, res) => {
 		let obj = JSON.parse(string);
  		res.send({ results: obj });
     //console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.delete('/api/deletecert', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.cert_id;
+
+	let sql = "DELETE FROM `Certifications` WHERE (`cert_id` = ?)";
+	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.post('/api/addcert', (req, res) => {
+	let connection = mysql.createConnection(config);
+  let name = req.body.cert_name;
+  let providerID = req.body.service_provider_id;
+
+	let sql = "INSERT INTO `Certifications` (service_provider_id, cert_name) VALUES (?, ?)";
+	let data = [providerID, name];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
 	});
 	connection.end();
 });

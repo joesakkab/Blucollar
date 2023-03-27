@@ -89,7 +89,7 @@ export default function CustomerProviderProfile(props) {
                       value={fName}
                       onChange={(fName) => setFName(fName.target.value)}
                       inputProps={{ 
-                        maxLength: 30,
+                        maxLength: 45,
                         readOnly: readOnlyState }}
                       />
                       <TextField 
@@ -98,7 +98,7 @@ export default function CustomerProviderProfile(props) {
                       value={LName}
                       onChange={(LName) => setLName(LName.target.value)}
                       inputProps={{ 
-                        maxLength: 30,
+                        maxLength: 45,
                         readOnly: readOnlyState }}
                       />
                       <TextField 
@@ -107,7 +107,7 @@ export default function CustomerProviderProfile(props) {
                       value={email}
                       onChange={(email) => setEmail(email.target.value)}
                       inputProps={{ 
-                        maxLength: 30,
+                        maxLength: 45,
                         readOnly: readOnlyState }}
                       />
                       <TextField 
@@ -116,7 +116,7 @@ export default function CustomerProviderProfile(props) {
                       value={location}
                       onChange={(location) => setLocation(location.target.value)}
                       inputProps={{ 
-                        maxLength: 30,
+                        maxLength: 45,
                         readOnly: readOnlyState }}
                       />
                   </CardContent>

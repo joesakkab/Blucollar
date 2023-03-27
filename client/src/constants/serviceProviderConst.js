@@ -7,6 +7,6 @@ export const DESCRIPTION = 'Description';
 export const SERVICETYPE = 'ServiceType'
 export const PASSWORD = 'Password';
 export const RATING = 'rating';
+export const CERTID = 'cert_id';
 export const CERTIFICATION = 'cert_name';
-export const CERT_IMG = 'cert_img_ref';
 export const EXPERIENCE = 'ExperienceYears'
