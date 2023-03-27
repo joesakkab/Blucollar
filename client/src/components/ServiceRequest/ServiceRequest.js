@@ -22,13 +22,13 @@ export default function ServiceRequest(props) {
 
       const submitReq = (reqObj) => {
         console.log(reqObj);
-        // callServiceRequestInitApi(reqObj).then(res => {
-        //   console.log("callApiLogin returned: ", res)
-        // })
+        callServiceRequestInitApi(reqObj).then(res => {
+          console.log("callServiceRequestInitApi returned: ", res)
+        })
       }
     
       const callServiceRequestInitApi = async (reqObj) => {
-        const url = serverURL + "/api/requestinit";
+        const url = serverURL + "/api/initservicerequest";
         console.log(url);
         console.log(JSON.stringify(reqObj))
     
@@ -56,9 +56,10 @@ export default function ServiceRequest(props) {
         console.log(Cookies.getItem('token'))
         let request = {
             location: location,
-            description: description,
-            ServiceType: serviceType,
-            Service_ProviderID: id
+            desc: description,
+            type: serviceType,
+            sp_id: id,
+            contact_info: "-------- Placeholder --------"
         }
         submitReq(request);
 

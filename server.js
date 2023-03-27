@@ -49,7 +49,7 @@ app.post("/api/signup", async (req, res) => {
 	const serviceType = req.body.serviceType;
 	const description = req.body.description;
 	const isServiceProvider = req.body.isServiceProvider;
-  const yearsExperience = req.body.yearsExperience;
+  	const yearsExperience = req.body.yearsExperience;
 
 	const pwdHashed = await bcrypt.hash(pwd, 10);
 
@@ -229,7 +229,7 @@ app.post('/api/getprofile', (req, res) => {
 app.post('/api/getcerts', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
-  console.log(id)
+  	console.log(id)
 	let sql = "SELECT certs.cert_name, certs.cert_img_ref FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
 	let data = [id];
 
@@ -247,51 +247,56 @@ app.post('/api/getcerts', (req, res) => {
 });
 
 app.post('/api/initservicerequest', (req, res) => {
-	let connection = mysql.createConnection(config);
+	auth(req, res, () => {
+		let connection = mysql.createConnection(config);
 
-	let cust_id = req.body.cust_id;
-	let sp_id = req.body.sp_id;
-	let location = req.body.location;
-	let desc = req.body.desc;
-	let type = req.body.type;
+		let cust_id = req.userID;
+		let sp_id = req.body.sp_id;
+		let location = req.body.location;
+		let desc = req.body.desc;
+		let type = req.body.type;
+		let contact = req.body.contact_info;
 
-	let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ReqID`, `Location`, `Description`, `Service Type`) VALUES (?, ?, ?, ?, ?)";
-	console.log(sql);
-	let data = [cust_id, sp_id, location, desc, type];
-	console.log(data);
+		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`) VALUES (?, ?, ?, ?, ?, ?)";
+		console.log(sql);
+		let data = [cust_id, sp_id, location, desc, type, contact];
+		console.log(data);
 
-	connection.query(sql, data, (error, results, fields) => {
-		if (error) {
-			return console.error(error.message);
-		}
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
 
-		let string = JSON.stringify(results);
-		let obj = JSON.parse(string);
-		res.send({ results: obj });
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+		connection.end();
 	});
-	connection.end();
 });
 
 app.post('/api/getservicerequests', (req, res) => {
-	let connection = mysql.createConnection(config);
+	auth(req, res, () => {
+		let connection = mysql.createConnection(config);
 
-	let id = req.userID;
-	
-	let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
-	console.log(sql);
-	let data = [id];
-	console.log(data);
+		let id = req.userID;
+		
+		let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
+		console.log(sql);
+		let data = [id];
+		console.log(data);
 
-	connection.query(sql, data, (error, results, fields) => {
-		if (error) {
-			return console.error(error.message);
-		}
+		connection.query(sql, data, (error, results, fields) => {
+			if (error) {
+				return console.error(error.message);
+			}
 
-		let string = JSON.stringify(results);
-		let obj = JSON.parse(string);
-		res.send({ results: obj });
+			let string = JSON.stringify(results);
+			let obj = JSON.parse(string);
+			res.send({ results: obj });
+		});
+		connection.end();
 	});
-	connection.end();
 });
 
 app.post('/api/updateservicerequest', (req, res) => {
@@ -318,12 +323,11 @@ app.post('/api/updateservicerequest', (req, res) => {
 	if (sr.status == 'start') {
 		// provider contacts customer for extra details
 		let button_status = req.body.status;
-		let contact_info = req.body.contact;
 
 		if (button_status == 'accept') {
-			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted', `contact_info` = ? WHERE Service_ReqID = ?";
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted'WHERE Service_ReqID = ?";
 			console.log(sql);
-			let data = [contact_info, sr_id];
+			let data = [sr_id];
 			console.log(data);
 
 			var sr = {}
