@@ -1,5 +1,4 @@
-import { makeStyles, TextareaAutosize } from "@material-ui/core";
-import { light } from "@material-ui/core/styles/createPalette";
+import { makeStyles } from "@material-ui/core";
 import defaultTheme from './theme';
 
 

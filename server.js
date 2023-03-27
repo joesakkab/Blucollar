@@ -99,12 +99,13 @@ app.post("/api/signup", async (req, res) => {
 		}
 	)
 	connection.query(
-		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
+		'SELECT cust_id, Null as Service_ProviderID FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
 		[email, email], 
 		(error, results, fields) => {
 			let string = JSON.stringify(results)
 			let obj = JSON.parse(string);
-			const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+      let tokenObj = {"cust_id": obj[0]["cust_id"], "Service_ProviderID": obj[0]['Service_ProviderID']}
+			const token = jwt.sign({ tokenObj }, process.env.JWT_KEY, { expiresIn: 86400});
 			console.log(token);
 			res.status(200).send({ token: token });
 		}
@@ -136,15 +137,6 @@ app.post("/api/login", async (req, res) => {
 			if (results.length == 0) {
 				res.status(403).send({ error: "User login failed (email does not exist)" });
 				return // User already exists
-			// } else {
-			// 	// let string = JSON.stringify(results);
-			// 	// let obj = JSON.parse(string);
-			// 	// const token = jwt.sign({ obj }, process.env.JWT_KEY, {
-			// 	// 	expiresIn: 86400 // expires in 24 hours
-			// 	// });
-			// 	console.log(token);
-			// 	res.status(200).send({ token: token });
-			// }
 		}
 
 		console.log("results password is ", results[0].Password);
@@ -159,7 +151,8 @@ app.post("/api/login", async (req, res) => {
 			if (result) {
 				let string = JSON.stringify(results)
 				let obj = JSON.parse(string);
-				const token = jwt.sign({ obj }, process.env.JWT_KEY, { expiresIn: 86400});
+        let tokenObj = {"cust_id": obj[0]["cust_id"], "Service_ProviderID": obj[0]['Service_ProviderID']}
+				const token = jwt.sign({ tokenObj }, process.env.JWT_KEY, { expiresIn: 86400});
 				console.log(token);
 				res.status(200).send({ token: token });
 			} else {
@@ -214,7 +207,7 @@ app.post('/api/load', (req, res) => {
 	connection.end();
 });
 
-app.post('/api/getprofile', (req, res) => {
+app.post('/api/getproviderprofile', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
 	let sql = "SELECT * FROM `Service Provider` WHERE Service_ProviderID = ?";
@@ -233,11 +226,81 @@ app.post('/api/getprofile', (req, res) => {
 	connection.end();
 });
 
+app.post('/api/getcustomerprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+	let sql = "SELECT * FROM `Customer` WHERE cust_id = ?"
+	let data = [id];
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+
+})
+
+app.put('/api/edituserprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+	const first = req.body.firstName;
+	const last = req.body.lastName;
+  const email = req.body.email;
+	const location = req.body.location;
+	
+	let sql = "UPDATE `Customer` SET `FirstName` = ?, `LastName` = ?, `Email` = ?, `PrimaryLocation` = ? WHERE (`cust_id` = ?)";
+	let data = [first, last, email, location, id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.put('/api/editproviderprofile', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.id;
+  console.log(id)
+	const first = req.body.firstName;
+	const last = req.body.lastName;
+  const email = req.body.email;
+	const location = req.body.location;
+  const description = req.body.description;
+  const serviceType = req.body.serviceType;
+  const experience = req.body.experience;
+
+	let sql = "UPDATE `Service Provider` SET `FirstName` = ?, `LastName` = ?, `Email` = ?, `PrimaryLocation` = ?, `Description` = ?, `ServiceType` = ?, `ExperienceYears` = ? WHERE (`Service_ProviderID` = ?)";
+	let data = [first, last, email, location, description, serviceType, experience, id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
 app.post('/api/getcerts', (req, res) => {
 	let connection = mysql.createConnection(config);
 	let id = req.body.id;
-  	console.log(id)
-	let sql = "SELECT certs.cert_name, certs.cert_img_ref FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
+	let sql = "SELECT certs.cert_id, certs.cert_name FROM `Service Provider` sp LEFT JOIN `Certifications` certs ON sp.Service_ProviderID = certs.service_provider_id WHERE sp.Service_ProviderID = ?";
 	let data = [id];
 
 	connection.query(sql, data, (error, results, fields) => {
@@ -249,6 +312,47 @@ app.post('/api/getcerts', (req, res) => {
 		let obj = JSON.parse(string);
  		res.send({ results: obj });
     //console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.delete('/api/deletecert', (req, res) => {
+	let connection = mysql.createConnection(config);
+	let id = req.body.cert_id;
+
+	let sql = "DELETE FROM `Certifications` WHERE (`cert_id` = ?)";
+	let data = [id];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
+	});
+	connection.end();
+});
+
+app.post('/api/addcert', (req, res) => {
+	let connection = mysql.createConnection(config);
+  let name = req.body.cert_name;
+  let providerID = req.body.service_provider_id;
+
+	let sql = "INSERT INTO `Certifications` (service_provider_id, cert_name) VALUES (?, ?)";
+	let data = [providerID, name];
+
+	connection.query(sql, data, (error, results, fields) => {
+		if (error) {
+			return console.error(error.message);
+		}
+
+		let string = JSON.stringify(results);
+		let obj = JSON.parse(string);
+ 		res.send({ results: obj });
+    console.log({results: obj})
 	});
 	connection.end();
 });
@@ -336,7 +440,7 @@ app.post('/api/updateservicerequest', (req, res) => {
 	console.log(data);
 
 	var sr = {}
-
+  
 	connection.query(sql, data, (error, results, fields) => {
 		if (error) {
 			return console.error(error.message);

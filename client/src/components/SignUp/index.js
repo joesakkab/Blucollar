@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useSyncExternalStore } from "react";
+import React, { Fragment, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Typography,
@@ -8,8 +8,6 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@material-ui/core";
-import validator from "validator";
-import * as FIELDS from '../../constants/serviceProviderConst';
 import history from "../Navigation/history";
 import * as ROUTES from "../../constants/routes";
 // import * as FIELDS from '../../constants/customerConst';
@@ -75,9 +73,9 @@ function SignUp() {
   const addSignup = (submitUser) => {
     console.log(submitUser);
     callApiAddSignup(submitUser).then(res => {
-      console.log("callApiAddReview returned: ", res)
+      console.log("callApiAddSignup returned: ", res)
       var parsed = JSON.parse(res.express);
-      console.log("callApiAddReview parsed: ", parsed);
+      console.log("callApiAddSignup parsed: ", parsed);
     })
   }
 

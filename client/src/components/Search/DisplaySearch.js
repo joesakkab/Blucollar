@@ -16,9 +16,9 @@ export default function DisplaySearch(props) {
     const classes = useStyles();
     return (
         <>
-            {allObjs.map( (obj) => {
+            {allObjs.map((obj) => {
                 return (
-                    <div className={classes.listing}>
+                    <div key={obj[FIELDS.ID]} className={classes.listing}>
                         <Card style={{ width: 1000 }}>
                             <CardActionArea onClick={() => history.push(ROUTES.PROFILE + "/" + obj[FIELDS.ID])}>
                             <CardContent>
