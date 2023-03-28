@@ -39,7 +39,7 @@ export default function InboxPage() {
   let token = Cookies.getItem("token");
   const decodedToken = jwt_decode(token);
   console.log("decoded token is ", decodedToken);
-  let userObj = decodedToken["obj"][0];
+  let userObj = decodedToken["tokenObj"];
   let custId = userObj[FIELDS.CUST_ID];
   console.log("User is ", userObj);
   const classes = useStyles();
