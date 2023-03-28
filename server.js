@@ -47,9 +47,10 @@ app.get('/api/ping', (req, res) => {
 	res.send({ express: "pong" });
 });
 
+// 
 app.post("/api/signup", async (req, res) => {
 	let connection = mysql.createConnection(config);
-
+  
 	const email = req.body.email;
 	const pwd = req.body.password;
 	const first = req.body.firstName;
@@ -58,62 +59,56 @@ app.post("/api/signup", async (req, res) => {
 	const serviceType = req.body.serviceType;
 	const description = req.body.description;
 	const isServiceProvider = req.body.isServiceProvider;
-  	const yearsExperience = req.body.yearsExperience;
-
+	const yearsExperience = req.body.yearsExperience;
+  
 	const pwdHashed = await bcrypt.hash(pwd, 10);
-
+  
+	console.log("Starting check");
 	connection.query(
-		'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
-		[email, email], 
-		(error, results, fields) => {
+	  'SELECT cust_id, Null as Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Null as Description, Null as ServiceType, Null as ExperienceYears FROM krajesh.`Customer` WHERE Email LIKE ? UNION SELECT Null as cust_id, Service_ProviderID, FirstName, LastName, Email, Password, PrimaryLocation, Description, ServiceType, ExperienceYears FROM krajesh.`Service Provider` WHERE Email LIKE ?', 
+	  [email, email], 
+	  (error, results, fields) => {
+		console.log("Checking");
+		console.log("FIRST QUERY: ", results)
+		if (error) {
+		  connection.end();
+		  return console.error(error.message);
+		}
+  
+		if (results.length > 0) {
+		  connection.end();
+		  res.status(403).send({ error: "User already exists!" });
+		  return // User already exists
+		}
+		console.log("Finished check");
+		// check if service providor then add into service providor table, else, add to user table
+		let sql, data;
+		if (isServiceProvider) {
+		  sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType, ExperienceYears) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+		  console.log(sql);
+		  data = [email, pwdHashed, first, last, location, description, serviceType, yearsExperience.substring(0,4)];
+		  console.log(data);
+		} else {
+		  sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';
+		  console.log(sql);
+		  data = [email, pwdHashed, first, last, location];
+		  console.log(data);
+		}
+  
+		connection.query(
+		  sql, 
+		  data, 
+		  (error, results, fields) => {
+			connection.end();
 			if (error) {
-				return console.error(error.message);
+			  return console.error(error.message);
 			}
-
-			if (results.length > 0) {
-				res.status(403).send({ error: "User already exists!" });
-				return // User already exists
-			}
-		}
+		  }
+		);
+	  }
 	);
-	// check if service providor then add into service providor table, else, add to user table
-	let sql, data;
-	if (isServiceProvider) {
-
-		sql = 'INSERT INTO krajesh.`Service Provider` (Email, Password, FirstName, LastName, PrimaryLocation, Description, ServiceType, ExperienceYears) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-		console.log(sql);
-		data = [email, pwdHashed, first, last, location, description, serviceType, yearsExperience.substring(0,4)];
-		console.log(data);
-	} else {
-		sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';
-		console.log(sql);
-		data = [email, pwdHashed, first, last, location];
-		console.log(data);
-	}
-	
-	connection.query(
-		sql, 
-		data, 
-		(error, results, fields) => {
-			if (error) {
-				return console.error(error.message);
-			}
-		}
-	)
-	connection.query(
-		'SELECT cust_id, Null as Service_ProviderID FROM krajesh.`Customer` WHERE Email LIKE "?" UNION SELECT Null as cust_id, Service_ProviderID FROM krajesh.`Service Provider` WHERE Email LIKE "?"', 
-		[email, email], 
-		(error, results, fields) => {
-			let string = JSON.stringify(results)
-			let obj = JSON.parse(string);
-      let tokenObj = {"cust_id": obj[0]["cust_id"], "Service_ProviderID": obj[0]['Service_ProviderID']}
-			const token = jwt.sign({ tokenObj }, process.env.JWT_KEY, { expiresIn: 86400});
-			console.log(token);
-			res.status(200).send({ token: token });
-		}
-	);
-	connection.end();
-});
+  });
+  
 
 app.post("/api/login", async (req, res) => {
 	let connection = mysql.createConnection(config);
