@@ -1,13 +1,10 @@
-import React, { Fragment, useState, useSyncExternalStore } from "react";
-import { Router, Switch, Route } from "react-router-dom";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Typography,
   Paper,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
 } from "@material-ui/core";
 import history from '../Navigation/history';
 import * as ROUTES from '../../constants/routes';
@@ -83,6 +80,7 @@ function SignIn() {
       // setStatus(response.status);
       alert(body.error)
     } else {
+      console.log(body.token)
       Cookies.setItem("token", body.token)
       console.log("Cookie of token is", Cookies.getItem("token"))
       history.push(ROUTES.SEARCH);
@@ -116,6 +114,7 @@ function SignIn() {
         <form noValidate autoComplete="off">
             
           <TextField
+            id="email"
             label="Email"
             variant="outlined"
             margin="normal"
@@ -127,6 +126,7 @@ function SignIn() {
             inputProps={{ maxLength: 30 }}
           />
           <TextField
+            id="password"
             label="Password"
             variant="outlined"
             margin="normal"
@@ -138,6 +138,7 @@ function SignIn() {
             inputProps={{ maxLength: 30 }}
           />
           <Button
+            id="signin"
             variant="contained"
             color="primary"
             className={classes.button}

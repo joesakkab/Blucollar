@@ -30,6 +30,7 @@ function CustInboxPage(props) {
 
 
 
+
   if (props.status == 'start') {
     return (
       <div>

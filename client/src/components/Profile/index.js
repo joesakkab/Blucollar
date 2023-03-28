@@ -68,7 +68,7 @@ function Profile() {
 
   // call the profile api
   const callApiProfile = async (given_id) => {
-    const url = serverURL + "/api/getprofile";
+    const url = serverURL + "/api/getproviderprofile";
     const profileID = JSON.stringify({"id": Number(given_id)})
     
 
