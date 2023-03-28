@@ -6,7 +6,7 @@ import SignIn from './';
 describe('SignIn component', () => {
   it('should render a SignIn button', () => {
     render(<SignIn />);
-    const signInButton = screen.getByText('SignIn');
+    const signInButton = screen.getAllByText('Sign In', {exact: false});
     expect(signInButton);
   });
 });

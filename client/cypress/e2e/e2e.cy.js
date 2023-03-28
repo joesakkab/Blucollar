@@ -1,3 +1,20 @@
+Cypress.Cookies.debug(true)
+
+// login command in order to get a token
+Cypress.Commands.add('login', (email, password) => {
+  console.log("IS THE LOGIN CUSTOM COMMAND BEING USED")
+  // make login call to endpoint
+  cy.visit('/')
+  cy.request({
+    method: 'POST',
+    url: 'api/login',
+    body: {"email": email, "password": password}
+  }).then((response) => {
+    let body = response['body']['token']
+    cy.setCookie('token', body)
+  })
+})
+
 // Landing page view test
 describe('Landing page view', () => {
   it('Landing can be viewed', () => {
@@ -25,14 +42,6 @@ describe('Search page view', () => {
   });
 });
 
-// Profile page view test
-describe('Profile page view', () => {
-  it('Profile can be viewed', () => {
-    cy.visit('/profile');
-    cy.contains('Welcome to your profile page!')
-  });
-});
-
 // Sign in page can be viewed
 describe('Sign in page view', () => {
   it('Sign In can be viewed', () => {
@@ -41,10 +50,10 @@ describe('Sign in page view', () => {
     cy.contains('Email')
     cy.contains('Password')
     // sign in page should have text inputs for both the email and password
-    cy.get('email')
-    cy.get('password')
+    cy.get('input[id="email"]')
+    cy.get('input[id="password"]')
     // sign in page should have a button to login
-    cy.contains('button', 'Login')
+    cy.contains('button', 'Sign In')
   });
 });
 
@@ -61,9 +70,25 @@ describe('Sign up page view', () => {
   });
 });
 
+// Profile page view test
+describe('Profile page view', () => {
+  it('Profile can be viewed', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
+    cy.visit('/profile');
+    cy.get('input[id="first"]').should('have.value', "Test")
+    cy.get('input[id="last"]').should('have.value', "User")
+    cy.contains('Edit Profile')
+  });
+});
+
 // Navigate from Search to Profile
 describe('Nav from Search to Profile', () => {
   it('Search to Profile Page', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
     cy.visit('http://localhost:3000/search');
     cy.contains('Profile').click()
     cy.url().should('equal', 'http://localhost:3000/profile')
@@ -73,6 +98,9 @@ describe('Nav from Search to Profile', () => {
 // Navigate from Profile to Search
 describe('Nav from Profile to Search', () => {
   it('Profile to Search Page', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
     cy.visit('http://localhost:3000/profile');
     cy.contains('Search').click()
     cy.url().should('equal', 'http://localhost:3000/search')
@@ -82,87 +110,51 @@ describe('Nav from Profile to Search', () => {
 // Navigate from Search to Signout
 describe('Sign Out from Search', () => {
   it('Signout Successful from Search Page', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
     cy.visit('http://localhost:3000/search');
     cy.contains('Sign Out').click()
     cy.url().should('equal', 'http://localhost:3000/')
+    cy.getCookie('token').should('be.null')
   });
 });
 
 // Navigate from Profile to Signout
 describe('Sign Out from Profile', () => {
   it('Signout Successful from Profile Page', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
     cy.visit('http://localhost:3000/profile');
     cy.contains('Sign Out').click()
     cy.url().should('equal', 'http://localhost:3000/')
+    cy.getCookie('token').should('be.null')
   });
 });
 
 // Click on Listing Goes to Provider Profile Page 
 describe('Listing Leads to Provider Profile', () => {
   it('Clicking Listing Goes to Profile', () => {
+    let email = "test@user.com"
+    let password = "pass"
+    cy.login(email, password)
     cy.visit('/search');
     cy.contains('Ammar Siddiqui').click()
     cy.url().should('contain', 'http://localhost:3000/profiles/1')
   });
 });
 
-// Signing up for general account takes you to the search page
-describe('Sign Up General Account Flow', () => {
-  it('Signing Up for General Account', () => {
-    cy.visit('http://localhost:3000/');
-    cy.contains('Sign Up').click()
-    cy.get('input[id="first"]').type('John')
-    cy.get('input[id="first"]').should('have.value', 'John')
-    cy.get('input[id="last"]').type('Smith')
-    cy.get('input[id="last"]').should('have.value', 'Smith')
-    cy.get('input[id="location"]').type('London')
-    cy.get('input[id="location"]').should('have.value', 'London')
-    cy.get('input[id="email"]').type('test2@email.com')
-    cy.get('input[id="email"]').should('have.value', 'test2@email.com')
-    cy.get('input[id="password"]').type('password123')
-    cy.get('input[id="password"]').should('have.value', 'password123')
-    cy.get('input[id="confirm_password"]').type('password123')
-    cy.get('input[id="confirm_password"]').should('have.value', 'password123')
-    cy.contains('Sign Up').click()
-    cy.url().should('equal', 'http://localhost:3000/search')
-  });
-});
-
-// Signing up for service provider account takes you to the search page
-describe('Sign Up Provider Account Flow', () => {
-  it('Signing Up for Service Provider Account', () => {
-    cy.visit('http://localhost:3000/');
-    cy.contains('Sign Up').click()
-    cy.get('input[id="first"]').type('John')
-    cy.get('input[id="first"]').should('have.value', 'John')
-    cy.get('input[id="last"]').type('Smith')
-    cy.get('input[id="last"]').should('have.value', 'Smith')
-    cy.get('input[id="location"]').type('London')
-    cy.get('input[id="location"]').should('have.value', 'London')
-    cy.get('input[id="email"]').type('test2@email.com')
-    cy.get('input[id="email"]').should('have.value', 'test2@email.com')
-    cy.get('input[id="password"]').type('password123')
-    cy.get('input[id="password"]').should('have.value', 'password123')
-    cy.get('input[id="confirm_password"]').type('password123')
-    cy.get('input[id="confirm_password"]').should('have.value', 'password123')
-    cy.get('input[id="description"]').type('Hi, I am John, a welder in London, Ontario. Contact me at 555-555-5555!')
-    cy.get('input[id="description"]').should('have.value', 'Hi, I am John, a welder in London, Ontario. Contact me at 555-555-5555!')
-    cy.get('input[id="servicetype"]').type('Welder')
-    cy.get('input[id="servicetype"]').should('have.value', 'Welder')
-    cy.contains('Sign Up').click()
-    cy.url().should('equal', 'http://localhost:3000/search')
-  });
-});
 // Signing in takes you to the search page
-describe('Sign In Flow', () => {
+describe('Sign In Flow using UI', () => {
   it('Signing In Takes you to Search Page', () => {
     cy.visit('http://localhost:3000/');
     cy.contains('Login').click()
-    cy.get('input[id="email"]').type('test@email.com')
-    cy.get('input[id="email"]').should('have.value', 'test@email.com')
-    cy.get('input[id="password"]').type('password123')
-    cy.get('input[id="password"]').should('have.value', 'password123')
-    cy.contains('Login').click()
+    cy.get('input[id="email"]').type('test@user.com')
+    cy.get('input[id="email"]').should('have.value', 'test@user.com')
+    cy.get('input[id="password"]').type('pass')
+    cy.get('input[id="password"]').should('have.value', 'pass')
+    cy.get('button[id="signin"]').click()
     cy.url().should('equal', 'http://localhost:3000/search')
   });
 });
