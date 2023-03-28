@@ -30,13 +30,15 @@ const auth = async (req, res, next) => {
 				.status(500)
 				.send({ auth: false, message: "Failed to authenticate token." });
 		// if everything good, save to request for use in other routes
-		if (decoded['obj'][0]['cust_id'] == null) {
-			req.userID = decoded['obj'][0]['Service_ProviderID'];
+		let obj = decoded['obj'][0];
+		if (obj.cust_id == null) {
+			req.user_id = obj.Service_ProviderID;
 			req.is_sr = true
-		} else if (decoded['obj'][0]['Service_ProviderID'] == null) {
-			req.userID = decoded['obj'][0]['cust_id'];
+		} else {
+			req.user_id = obj.cust_id;
 			req.is_sr = false
 		}
+		console.log("user_id is ", req.user_id)
 		next();
 	});
 };
@@ -361,16 +363,17 @@ app.post('/api/initservicerequest', (req, res) => {
 	auth(req, res, () => {
 		let connection = mysql.createConnection(config);
 
-		let cust_id = req.userID;
+		let cust_id = req.user_id;
 		let sp_id = req.body.sp_id;
 		let location = req.body.location;
 		let desc = req.body.desc;
 		let type = req.body.type;
 		let contact = req.body.contact_info;
+		let status = "start";
 
-		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, 'start')";
+		let sql = "INSERT INTO krajesh.`Service Request` (`cust_id`, `Service_ProviderID`, `Location`, `Description`, `Service Type`, `contact_info`, `Status`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		console.log(sql);
-		let data = [cust_id, sp_id, location, desc, type, contact];
+		let data = [cust_id, sp_id, location, desc, type, contact, status];
 		console.log(data);
 
 		connection.query(sql, data, (error, results, fields) => {
@@ -390,11 +393,11 @@ app.post('/api/getservicerequests', (req, res) => {
 	auth(req, res, () => {
 		let connection = mysql.createConnection(config);
 
-		let id = req.userID;
+		let id = req.user_id;
 		let is_sr = req.is_sr;
 		
 		if (is_sr) {
-			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `service_providerID` = ?";
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `service_providerID` = ? AND `status` IN ('start', 'accepted', 'review', 'completed')";
 			console.log(sql);
 			let data = [id];
 			console.log(data);
@@ -410,7 +413,7 @@ app.post('/api/getservicerequests', (req, res) => {
 			});
 			connection.end();
 		} else {
-			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ?";
+			let sql = "SELECT * FROM krajesh.`Service Request` WHERE `cust_id` = ? AND `status` IN ('review', 'start', 'accepted')";
 			console.log(sql);
 			let data = [id];
 			console.log(data);
@@ -429,7 +432,7 @@ app.post('/api/getservicerequests', (req, res) => {
 	});
 });
 
-app.post('/api/updateservicerequest', (req, res) => {
+app.post ('/api/getcurrentstatus', (req, res) => {
 	let connection = mysql.createConnection(config);
 
 	let sr_id = req.body.service_request_id;
@@ -438,24 +441,52 @@ app.post('/api/updateservicerequest', (req, res) => {
 	console.log(sql);
 	let data = [sr_id];
 	console.log(data);
-
-	var sr = {}
   
 	connection.query(sql, data, (error, results, fields) => {
 		if (error) {
 			return console.error(error.message);
 		}
 
-		let string = JSON.stringify(results);
-		sr = JSON.parse(string);
+		let string = JSON.stringify(results[0]);
+		let obj = JSON.parse(string);
+		res.send({ results: obj });
 	});
+	connection.end();
+});
 
-	if (sr.status == 'start') {
+
+
+app.post('/api/updateservicerequest', (req, res) => {
+	let connection = mysql.createConnection(config);
+
+	let sr_id = req.body.service_request_id;
+	let curr_status = req.body.status;
+	
+	// let sql = "SELECT * FROM krajesh.`Service Request` WHERE Service_ReqID = ?";
+	// console.log(sql);
+	// let data = [sr_id];
+	// console.log(data);
+
+	// var sr = {}
+
+	// connection.query(sql, data, (error, results, fields) => {
+	// 	if (error) {
+	// 		return console.error(error.message);
+	// 	}
+	// 	let string = JSON.stringify(results[0]);
+	// 	// console.log("String is ", string)
+	// 	sr = JSON.parse(string);
+	// 	// console.log("sr is", sr)
+	// 	console.log("sr.Status is: " + sr.Status)
+	// });
+
+	if (curr_status == 'start') {
 		// provider contacts customer for extra details
-		let button_status = req.body.status;
+		let button_status = req.body.button_status;
+		console.log("button status is ", button_status);
 
 		if (button_status == 'accept') {
-			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted'WHERE Service_ReqID = ?";
+			let sql = "UPDATE krajesh.`Service Request` SET `status` = 'accepted' WHERE Service_ReqID = ?";
 			console.log(sql);
 			let data = [sr_id];
 			console.log(data);
@@ -489,14 +520,12 @@ app.post('/api/updateservicerequest', (req, res) => {
 				res.send({ results: obj });
 			});
 		}
-	} else if (sr.status == 'accepted') {
+	} else if (curr_status == 'accepted') {
 		// provider accepts request and completes the job
 		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'review' WHERE Service_ReqID = ?";
 		console.log(sql);
 		let data = [sr_id];
 		console.log(data);
-
-		var sr = {}
 
 		connection.query(sql, data, (error, results, fields) => {
 			if (error) {
@@ -507,12 +536,12 @@ app.post('/api/updateservicerequest', (req, res) => {
 			let obj = JSON.parse(string);
 			res.send({ results: obj });
 		});
-	} else if (sr.status == 'review') {
+	} else if (curr_status == 'review') {
 		// set status to 'completed'
 		let review_score = req.body.score;
 		let review_desc = req.body.review;
 
-		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'completed', `review_score` = ?, `review_desc` = ? WHERE Service_ReqID = ?";
+		let sql = "UPDATE krajesh.`Service Request` SET `status` = 'completed', `review_score` = ?, `review_description` = ? WHERE Service_ReqID = ?";
 		console.log(sql);
 		let data = [review_score, review_desc, sr_id];
 		console.log(data);

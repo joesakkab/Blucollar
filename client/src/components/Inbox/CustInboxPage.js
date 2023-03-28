@@ -1,139 +1,107 @@
 import React from "react";
-import theme from "../Search/theme";
-import { MuiThemeProvider } from "@material-ui/core";
-import NavigationBar from "../NavigationBar";
-import Cookies from "js-cookies";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
-import { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import NavBar from "../NavigationBar";
-import jwtDecode from "jwt-decode";
-// export default function Inbox() {
-// 	return (
-// 		<MuiThemeProvider theme={theme}>
-// 			<NavigationBar />
-// 		</MuiThemeProvider>
-// 	)
-
-// }
-const useStyles = makeStyles((theme) => ({
-  root: {
-    height: "100vh",
-    backgroundColor: "#2196f3",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "DM Sans, sans-serif", // Set the font family to DM Sans
-  },
-  title: {
-    marginBottom: theme.spacing(2),
-    color: "#fff",
-    textAlign: "center",
-  },
-  description: {
-    marginBottom: theme.spacing(4),
-    color: "#fff",
-    textAlign: "center",
-    maxWidth: 600,
-    margin: "0 auto",
-  },
-  paper: {
-    padding: theme.spacing(3),
-    maxWidth: 400,
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between", // Add space between the text and the buttons
-    marginTop: theme.spacing(4),
-    // backgroundColor: 'transparent', // Set the background color of the paper to transparent
-  },
-  button: {
-    width: "60%", // Set the button width to 30% to allow space between them
-    margin: theme.spacing(1),
-    backgroundColor: "#2196f3", // Set the button background color to match the background color of the page
-    color: "#fff", // Set the button text color to white
-  },
-}));
-
-const initialMessages = [
-  {
-    id: 1,
-    subject: "Welcome to My App",
-    sender: "Admin",
-    body: "Welcome to my app! This is just a demo message to show you how messages can be displayed on this page.",
-  },
-  {
-    id: 2,
-    subject: "Reminder: Meeting Tomorrow",
-    sender: "John Doe",
-    body: "Just a friendly reminder that we have a meeting tomorrow at 10am. See you then!",
-  },
-];
+import useStyles from '../Search/Styles';
+import { Typography, Modal, TextField, Button, Box } from '@material-ui/core';
+import Rating from '@material-ui/lab/Rating';
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import theme from '../Search/theme';
 
 
+function CustInboxPage(props) {
 
-function CustInboxPage() {
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+  // decalre initial states
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const classes = useStyles();
-  const [messages, setMessages] = useState(initialMessages);
+  const status = props.status;
+  console.log(status)
 
-  const handleAccept = (id) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) => {
-        if (message.id === id) {
-          return { ...message, status: "Accepted" };
-        }
-        return message;
-      })
-    );
-  };
 
-  const handleDecline = (id) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) => {
-        if (message.id === id) {
-          return { ...message, status: "Declined" };
-        }
-        return message;
-      })
-    );
-  };
 
-  return (
-    <div className={classes.root}>
-      <Typography variant="h4" className={classes.title}>
-        Inbox
-      </Typography>
-      {messages.length === 0 ? (
-        <Typography variant="body1" className={classes.description}>
-          You have no messages.
+
+  if (props.status == 'start') {
+    return (
+      <div>
+        <Typography>
+          <b>Wait for service provider to accept service.</b>
         </Typography>
-      ) : (
-        messages.map((message) => (
-          <Paper key={message.id} className={classes.paper}>
-            <div>
-              <Typography variant="h6">{message.subject}</Typography>
-              <Typography variant="subtitle1">
-                From: {message.sender}
-              </Typography>
-              <Typography variant="body1">{message.body}</Typography>
-            </div>
-            <div>
-              <Button
-                variant="contained"
-                className={classes.acceptButton}
-                onClick={() => handleAccept(message.id)}
-              >
-                Review
-              </Button>
-            </div>
-          </Paper>
-        ))
-      )}
+      </div>
+    )
+  } else if ( props.status == "accepted") {
+    return (
+      <div>
+      <Typography>
+        <b>Waiting for provider to complete the job.</b>
+      </Typography>
     </div>
-  );
+  
+    );
+  } else if (props.status == "review") {
+    return (
+      <div>
+        <MuiThemeProvider theme={theme}>
+          <Button variant='contained' classeName={classes.button} onClick={handleOpen}>Add Review</Button>
+          <Modal
+              open={open}
+              onClose={handleClose}
+          >
+              <form noValidate autoComplete="off">
+                  <Box sx={style}>
+                      <Typography>Write a review!</Typography>
+                      <TextField 
+                      id="review-body" 
+                      placeholder='Write your review here ...'
+                      type="text"
+                      multiline
+                      rows={2}
+                      onChange={(desc) => props.setReviewDesc(desc.target.value)}> </TextField>
+                      <div>
+                          <Rating 
+                          name="no-value" 
+                          value={props.score} 
+                          // onChange={(score) => props.setReviewScore(score.target.value)}
+                          onChange={(event, score) => {props.setReviewScore(score); }}
+                          />
+                      </div>
+                      <Button
+                      type='submit'
+                      id='submit-review'
+                      onClick = {props.handleAddReview}>
+                          Submit Review
+                      </Button>
+                  </Box>
+              </form>
+              
+          </Modal>
+          </MuiThemeProvider>
+      </div>
+    )
+  }
+  else if (props.status == "completed") {
+    return (
+      <div>
+        <Typography>
+          Thank you for your review!
+        </Typography>
+      </div>
+    )
+  } else {
+    return (
+      <div></div>
+    );
+  }
+  
 }
 export default CustInboxPage;

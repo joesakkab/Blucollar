@@ -2,6 +2,8 @@ import React from "react";
 import {Button, Modal, Box, MuiThemeProvider, TextField, makeStyles} from "@material-ui/core";
 import theme from '../Search/theme';
 import Cookies from "js-cookies";
+import * as ROUTES from '../../constants/routes';
+// import * as FIELDS from '../../constants/serviceRequestConst';
 
 export default function ServiceRequest(props) {
 
@@ -35,6 +37,7 @@ export default function ServiceRequest(props) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "authorization": "Bearer " + Cookies.getItem('token')
           },
           body: JSON.stringify(reqObj), 
           auth: {"token": Cookies.getItem('token')},
@@ -58,7 +61,7 @@ export default function ServiceRequest(props) {
             desc: description,
             type: serviceType,
             sp_id: id,
-            contact_info: "-------- Placeholder --------"
+            contact_info: contact
         }
         submitReq(request);
 
@@ -107,6 +110,16 @@ export default function ServiceRequest(props) {
                     fullWidth
                     value={description}
                     onChange={(description) => setDescription(description.target.value)}
+                    inputProps={{ maxLength: 200 }}
+                    />
+                    <TextField
+                    label="Contact Info"
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    value={contact}
+                    onChange={(contact) => setContact(contact.target.value)}
                     inputProps={{ maxLength: 200 }}
                     />
                     <Button
