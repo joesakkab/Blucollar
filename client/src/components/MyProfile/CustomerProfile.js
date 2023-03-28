@@ -84,6 +84,7 @@ export default function CustomerProviderProfile(props) {
               <Card>
                   <CardContent>
                       <TextField
+                      id="first"
                       label="First Name" 
                       className={classes.test2} 
                       value={fName}
@@ -93,6 +94,7 @@ export default function CustomerProviderProfile(props) {
                         readOnly: readOnlyState }}
                       />
                       <TextField 
+                      id="last"
                       label="Last Name" 
                       className={classes.test2}
                       value={LName}
@@ -102,6 +104,7 @@ export default function CustomerProviderProfile(props) {
                         readOnly: readOnlyState }}
                       />
                       <TextField 
+                      id="email"
                       label="Email"
                       className={classes.test2}
                       value={email}
@@ -111,6 +114,7 @@ export default function CustomerProviderProfile(props) {
                         readOnly: readOnlyState }}
                       />
                       <TextField 
+                      id="location"
                       label="Location" 
                       className={classes.test2} 
                       value={location}

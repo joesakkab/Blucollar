@@ -80,6 +80,7 @@ function SignIn() {
       // setStatus(response.status);
       alert(body.error)
     } else {
+      console.log(body.token)
       Cookies.setItem("token", body.token)
       console.log("Cookie of token is", Cookies.getItem("token"))
       history.push(ROUTES.SEARCH);
@@ -113,6 +114,7 @@ function SignIn() {
         <form noValidate autoComplete="off">
             
           <TextField
+            id="email"
             label="Email"
             variant="outlined"
             margin="normal"
@@ -124,6 +126,7 @@ function SignIn() {
             inputProps={{ maxLength: 30 }}
           />
           <TextField
+            id="password"
             label="Password"
             variant="outlined"
             margin="normal"
@@ -135,6 +138,7 @@ function SignIn() {
             inputProps={{ maxLength: 30 }}
           />
           <Button
+            id="signin"
             variant="contained"
             color="primary"
             className={classes.button}

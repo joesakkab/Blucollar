@@ -85,7 +85,7 @@ app.post("/api/signup", async (req, res) => {
 	} else {
 		sql = 'INSERT INTO krajesh.`Customer` (Email, Password, FirstName, LastName, PrimaryLocation) VALUES (?, ?, ?, ?, ?)';
 		console.log(sql);
-		data = [email, pwd, first, last, location];
+		data = [email, pwdHashed, first, last, location];
 		console.log(data);
 	}
 	
