@@ -76,7 +76,7 @@ function SignUp() {
     console.log(submitUser);
     callApiAddSignup(submitUser).then(res => {
       console.log("callApiAddReview returned: ", res)
-      var parsed = JSON.parse(res.express);
+      var parsed = JSON.parse(res['results']);
       console.log("callApiAddReview parsed: ", parsed);
     })
   }

@@ -16,6 +16,18 @@ export default createTheme({
           dark: '#32445c',
           contrastText: '#fff',
         },
+        accept: {
+          light: '#357a38',
+          main: '#4caf50',
+          dark: '#6fbf73',
+          contrastText: '#fff',
+        },
+        decline: {
+          light: '#f73378',
+          main: '#f50057',
+          dark: '#ab003c',
+          contrastText: '#fff',
+        }
     },
 
 })

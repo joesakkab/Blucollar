@@ -1,4 +1,5 @@
 import { makeStyles, TextareaAutosize } from "@material-ui/core";
+import { green, red } from "@material-ui/core/colors";
 import { light } from "@material-ui/core/styles/createPalette";
 import defaultTheme from './theme';
 
@@ -55,6 +56,36 @@ export default makeStyles((theme) => ({
             backgroundColor: defaultTheme.palette.primary.contrastText,
             color: defaultTheme.palette.primary.light
         }
+      },
+      acceptButton: {
+        width: '10%',
+        margin: theme.spacing(1),
+        backgroundColor: defaultTheme.palette.accept.main,
+        color: defaultTheme.palette.accept.contrastText,
+        borderRadius:defaultTheme.spacing(5),
+        "&:hover": {
+          backgroundColor: defaultTheme.palette.accept.light,
+          color: defaultTheme.palette.accept.contrastText
+      },
+      "&:active": {
+          backgroundColor: defaultTheme.palette.accept.contrastText,
+          color: defaultTheme.palette.accept.light
+      }
+      },
+      declineButton: {
+        width: '10%',
+        margin: theme.spacing(1),
+        backgroundColor: defaultTheme.palette.decline.main,
+        color: defaultTheme.palette.decline.contrastText,
+        borderRadius:defaultTheme.spacing(5),
+        "&:hover": {
+          backgroundColor: defaultTheme.palette.decline.light,
+          color: defaultTheme.palette.decline.contrastText
+      },
+      "&:active": {
+          backgroundColor: defaultTheme.palette.decline.contrastText,
+          color: defaultTheme.palette.decline.light
+      }
       },
 
       searchBar: {
