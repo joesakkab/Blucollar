@@ -33,7 +33,7 @@ export default function DisplaySearch(props) {
                                 </Typography>
                                 <Rating name="half-rating-read" defaultValue={obj[FIELDS.RATING]} precision={0.1} readOnly />
                                 <Typography>
-                                {obj[FIELDS.RATING] + " / 5.0"}
+                                {obj[FIELDS.RATING] == null ? "No Ratings" : obj[FIELDS.RATING] + " / 5.0 out of " +  obj[FIELDS.REVIEW_COUNT] + " ratings"}
                                 </Typography>
                             </CardContent>
                             </CardActionArea>
