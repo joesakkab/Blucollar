@@ -30,7 +30,7 @@ const auth = async (req, res, next) => {
 				.status(500)
 				.send({ auth: false, message: "Failed to authenticate token." });
 		// if everything good, save to request for use in other routes
-		let obj = decoded['obj'][0];
+		let obj = decoded['tokenObj'];
 		if (obj.cust_id == null) {
 			req.user_id = obj.Service_ProviderID;
 			req.is_sr = true
