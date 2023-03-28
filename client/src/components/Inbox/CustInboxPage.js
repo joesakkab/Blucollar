@@ -104,7 +104,6 @@ function CustInboxPage() {
 
   return (
     <div className={classes.root}>
-      <NavBar />
       <Typography variant="h4" className={classes.title}>
         Inbox
       </Typography>
