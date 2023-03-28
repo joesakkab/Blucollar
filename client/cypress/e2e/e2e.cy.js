@@ -158,3 +158,23 @@ describe('Sign In Flow using UI', () => {
     cy.url().should('equal', 'http://localhost:3000/search')
   });
 });
+  // inbox page works
+  describe('Inbox page can be viewed', () => {
+    it('Inbox page can be viewed', () => {
+      let email = "test@user.com"
+      let password = "pass"
+      cy.login(email, password)
+      cy.visit('/inbox')
+      cy.contains("Inbox")
+    });
+  });
+  // can create a service request
+  describe('Service Request can be created', () => {
+    it('Service Request can be created', () => {
+      let email = "test@user.com"
+      let password = "pass"
+      cy.login(email, password)
+      cy.visit('/profiles/1')
+      cy.contains('Create service request').click()
+    });
+  });
