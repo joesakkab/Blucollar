@@ -172,7 +172,7 @@ app.post('/api/searchbyservice', (req, res) => {
 
 	let service = req.body.serviceType;
 
-	let sql = 'SELECT * FROM krajesh.`Service Provider` WHERE ServiceType LIKE ?';
+	let sql = 'SELECT sp.Service_ProviderID, sp.FirstName, sp.LastName, sp.Description, sp.Email, avg(sr.review_score) as averageScore, sp.PrimaryLocation, sp.ServiceType, sp.ExperienceYears, count(sr.review_score) as revCount FROM krajesh.`Service Provider` as sp LEFT JOIN krajesh.`Service Request` as sr ON sp.Service_ProviderID = sr.service_providerID WHERE sp.ServiceType LIKE ? GROUP BY sp.Service_ProviderID';
 	console.log(sql);
 	let data = ['%' + service + '%'];
 	console.log(data);
@@ -192,7 +192,7 @@ app.post('/api/searchbyservice', (req, res) => {
 app.post('/api/load', (req, res) => {
 	let connection = mysql.createConnection(config);
 
-	let sql = 'SELECT * FROM krajesh.`Service Provider`';
+	let sql = 'SELECT sp.Service_ProviderID, sp.FirstName, sp.LastName, sp.Description, sp.Email, avg(sr.review_score) as averageScore, sp.PrimaryLocation, sp.ServiceType, sp.ExperienceYears, count(sr.review_score) as revCount FROM krajesh.`Service Provider` as sp LEFT JOIN krajesh.`Service Request` as sr ON sp.Service_ProviderID = sr.service_providerID GROUP BY sp.Service_ProviderID';
 	// console.log(sql);
 	let data = []
 
