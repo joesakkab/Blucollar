@@ -68,9 +68,10 @@ export default function ServiceRequest(props) {
       } else {
         alert("Please ensure that all fields are entered!")
       }
+      handleClose()
     }
 
-	const [open, setOpen] = React.useState(false);
+	  const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 

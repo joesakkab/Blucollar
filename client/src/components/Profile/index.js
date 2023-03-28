@@ -4,6 +4,8 @@ import NavBar from '../NavigationBar';
 import { useParams } from 'react-router-dom';
 import DisplayProfile from './DisplayProfile';
 import ServiceRequest from '../ServiceRequest/ServiceRequest';
+import Cookies from "js-cookies";
+import jwt_decode from "jwt-decode";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,6 +67,11 @@ function Profile() {
   const params = useParams();
   const [profile, setProfile] = useState([]);
   const [certs, setCerts] = useState([]);
+
+  let token = Cookies.getItem('token')
+  const decodedToken = jwt_decode(token);
+  let userObj = decodedToken["tokenObj"];
+  let custID = userObj['cust_id'];
 
   // call the profile api
   const callApiProfile = async (given_id) => {
@@ -135,7 +142,7 @@ function Profile() {
           <DisplayProfile profileData={profile} certData={certs}/>
       </div>
       <div>
-        <ServiceRequest profileData={profile}/>
+        {custID !== null ? <ServiceRequest profileData={profile}/> : ''}
       </div>
     </div>
   );
