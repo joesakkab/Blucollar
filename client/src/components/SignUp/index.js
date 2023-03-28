@@ -10,7 +10,9 @@ import {
 } from "@material-ui/core";
 import history from "../Navigation/history";
 import * as ROUTES from "../../constants/routes";
+import Cookies from 'js-cookies';
 // import * as FIELDS from '../../constants/customerConst';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,7 +94,15 @@ function SignUp() {
       body: JSON.stringify(userObject)
     });
     const body = await response.json();
-    if (response.status !== 200) throw Error(body.message);
+    if (response.status !== 200) {
+      // setStatus(response.status);
+      alert(body.error)
+    } else {
+      console.log(body.token)
+      Cookies.setItem("token", body.token)
+      console.log("Cookie of token is", Cookies.getItem("token"))
+      history.push(ROUTES.SEARCH);
+    }
     console.log(" success : ", body);
     return body;
   }
@@ -124,8 +134,6 @@ function SignUp() {
       }
       console.log(submitUser)
       addSignup(submitUser)
-      history.push(ROUTES.SEARCH);
-
     } else if (password !== confPassword) {
       alert("Passwords do not match please re-enter!")
     } else {
