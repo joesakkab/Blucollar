@@ -101,7 +101,7 @@ function SignUp() {
       console.log(body.token)
       Cookies.setItem("token", body.token)
       console.log("Cookie of token is", Cookies.getItem("token"))
-      history.push(ROUTES.SEARCH);
+      history.push(ROUTES.SIGN_IN);
     }
     console.log(" success : ", body);
     return body;
@@ -134,6 +134,7 @@ function SignUp() {
       }
       console.log(submitUser)
       addSignup(submitUser)
+      history.push(ROUTES.SIGN_IN);
     } else if (password !== confPassword) {
       alert("Passwords do not match please re-enter!")
     } else {
